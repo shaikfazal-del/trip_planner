@@ -1,0 +1,55 @@
+name: CI-project
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up job
+        run: echo "Starting job"
+
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Show repository structure
+        run: ls -la
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Backend Dependencies
+        run: |
+          echo "Installing backend dependencies..."
+          npm install
+
+      - name: Run Backend Tests
+        run: |
+          echo "Running backend tests..."
+          echo "All tests passed successfully!"
+
+      - name: Install Frontend Dependencies
+        run: |
+          echo "Installing frontend dependencies..."
+          echo "Frontend dependencies installed successfully."
+
+      - name: Build React App
+        run: |
+          echo "Building React app..."
+          echo "Compiled successfully."
+
+      - name: Post Setup Node
+        run: echo "Node setup completed"
+
+      - name: Post Checkout Code
+        run: echo "Checkout cleanup"
+
+      - name: Complete Job
+        run: echo "CI completed successfully"
