@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <script>tailwind.config={theme:{extend:{colors:{primary:{500:'#0ea5e9',600:'#0284c7',700:'#0369a1'},accent:{500:'#f97316',600:'#ea580c'},dark:{800:'#1e293b',900:'#0f172a',950:'#020617'}},fontFamily:{sans:['Inter','sans-serif'],display:['Playfair Display','serif']}}}}</script>
+  <style>
+    body{font-family:'Inter',sans-serif;}
+    .glass{background:rgba(255,255,255,0.07);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.12);}
+    .glass-dark{background:rgba(15,23,42,0.85);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.08);}
+    .gradient-text{background:linear-gradient(135deg,#38bdf8,#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .btn-primary{background:linear-gradient(135deg,#0ea5e9,#0369a1);transition:all 0.3s;}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(14,165,233,0.45);}
+    .btn-accent{background:linear-gradient(135deg,#f97316,#ea580c);transition:all 0.3s;}
+    .btn-accent:hover{transform:translateY(-2px);}
+    .nav-link{position:relative;}.nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:linear-gradient(90deg,#38bdf8,#f97316);transition:width 0.3s;}.nav-link:hover::after{width:100%;}
+    .badge{display:inline-flex;align-items:center;padding:2px 10px;border-radius:999px;font-size:0.7rem;font-weight:600;text-transform:uppercase;}
+    .stat-card{transition:all 0.3s;}.stat-card:hover{transform:translateY(-4px);}
+    .table-row{transition:background 0.2s;}.table-row:hover{background:rgba(255,255,255,0.04);}
+    ::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:#0f172a;}::-webkit-scrollbar-thumb{background:#0ea5e9;border-radius:3px;}
+  </style>
+</head>
+<body class="bg-dark-950 text-slate-100 min-h-screen">
+<%- include('../partials/navbar') %>
+<%- include('../partials/flash') %>
+
+<!-- Header -->
+<div class="glass-dark border-b border-white/5 px-6 py-8">
+  <div class="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-4">
+    <div>
+      <h1 class="font-display text-3xl font-bold text-white">Planner <span class="gradient-text">Dashboard</span></h1>
+      <p class="text-slate-400 text-sm mt-1">Welcome back, <span class="text-sky-400 font-semibold"><%= user.name %></span> 👋</p>
+    </div>
+    <div class="flex gap-3 flex-wrap">
+      <a href="/planner/add-trip" class="btn-primary px-5 py-2.5 rounded-xl text-white text-sm font-semibold flex items-center gap-2">
+        <i class="fas fa-plus"></i> Add Trip
+      </a>
+      <a href="/planner/add-hotel" class="btn-accent px-5 py-2.5 rounded-xl text-white text-sm font-semibold flex items-center gap-2">
+        <i class="fas fa-hotel"></i> Add Hotel
+      </a>
+      <a href="/planner/add-transport" class="glass px-5 py-2.5 rounded-xl text-white text-sm font-semibold flex items-center gap-2 hover:bg-white/10 transition-all">
+        <i class="fas fa-bus-alt"></i> Add Transport
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-6 py-8 space-y-8">
+
+  <!-- Stats -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+    <% const stats = [
+      {label:'Total Trips',value:trips.length,icon:'fas fa-map-marked-alt',color:'sky',sub:'Active packages'},
+      {label:'Hotels Listed',value:hotels.length,icon:'fas fa-hotel',color:'purple',sub:'Available stays'},
+      {label:'Transport Options',value:transports.length,icon:'fas fa-bus-alt',color:'blue',sub:'Routes added'},
+      {label:'Total Revenue',value:'₹'+totalRevenue.toLocaleString(),icon:'fas fa-rupee-sign',color:'green',sub:'From bookings'}
+    ] %>
+    <% stats.forEach(s => { %>
+    <div class="glass-dark rounded-2xl p-5 stat-card">
+      <div class="flex items-center justify-between mb-3">
+        <div class="w-10 h-10 rounded-xl bg-<%= s.color %>-500/15 flex items-center justify-center">
+          <i class="<%= s.icon %> text-<%= s.color %>-400"></i>
+        </div>
+        <div class="text-xs text-slate-500 uppercase tracking-wider"><%= s.sub %></div>
+      </div>
+      <div class="text-2xl font-bold text-white"><%= s.value %></div>
+      <div class="text-slate-400 text-sm mt-1"><%= s.label %></div>
+    </div>
+    <% }) %>
+  </div>
+
+  <!-- Trips Table -->
+  <div class="glass-dark rounded-2xl overflow-hidden">
+    <div class="px-6 py-4 border-b border-white/8 flex items-center justify-between">
+      <h2 class="font-bold text-white flex items-center gap-2"><i class="fas fa-route text-sky-400"></i> My Trips</h2>
+      <a href="/planner/add-trip" class="btn-primary px-4 py-2 rounded-xl text-white text-xs font-semibold flex items-center gap-1">
+        <i class="fas fa-plus"></i> New Trip
+      </a>
+    </div>
+    <% if (trips.length === 0) { %>
+      <div class="text-center py-12 text-slate-400">
+        <i class="fas fa-map-signs text-4xl mb-3 block text-slate-600"></i>
+        No trips yet. <a href="/planner/add-trip" class="text-sky-400 hover:underline">Add your first trip</a>
+      </div>
+    <% } else { %>
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead><tr class="text-xs text-slate-400 uppercase tracking-wider border-b border-white/5">
+          <th class="px-6 py-3 text-left">Trip</th>
+          <th class="px-6 py-3 text-left">Destination</th>
+          <th class="px-6 py-3 text-left">Days</th>
+          <th class="px-6 py-3 text-left">Budget</th>
+          <th class="px-6 py-3 text-left">Booked</th>
+          <th class="px-6 py-3 text-left">Status</th>
+          <th class="px-6 py-3 text-left">Actions</th>
+        </tr></thead>
+        <tbody>
+          <% trips.forEach(trip => { %>
+          <tr class="table-row border-b border-white/5">
+            <td class="px-6 py-4">
+              <div class="font-semibold text-white text-sm"><%= trip.title %></div>
+              <div class="text-xs text-slate-500 capitalize"><%= trip.category %></div>
+            </td>
+            <td class="px-6 py-4 text-slate-300 text-sm"><i class="fas fa-map-marker-alt text-sky-400 mr-1"></i><%= trip.destination %></td>
+            <td class="px-6 py-4 text-slate-300 text-sm"><%= trip.days %>d</td>
+            <td class="px-6 py-4">
+              <div class="text-white text-sm font-medium">₹<%= trip.budgetMin.toLocaleString() %>+</div>
+              <span class="badge <%= trip.budgetCategory==='budget'?'bg-green-500/20 text-green-400':trip.budgetCategory==='luxury'?'bg-purple-500/20 text-purple-400':'bg-sky-500/20 text-sky-400' %>"><%= trip.budgetCategory %></span>
+            </td>
+            <td class="px-6 py-4 text-slate-300 text-sm"><%= trip.totalBookings %></td>
+            <td class="px-6 py-4">
+              <span class="badge <%= trip.isActive?'bg-green-500/20 text-green-400':'bg-red-500/20 text-red-400' %>">
+                <i class="fas fa-circle text-xs mr-1"></i><%= trip.isActive?'Active':'Inactive' %>
+              </span>
+            </td>
+            <td class="px-6 py-4">
+              <div class="flex gap-2">
+                <a href="/traveler/trips/<%= trip._id %>" class="w-8 h-8 glass rounded-lg flex items-center justify-center text-slate-400 hover:text-sky-400 transition-colors" title="View">
+                  <i class="fas fa-eye text-xs"></i>
+                </a>
+                <a href="/planner/edit-trip/<%= trip._id %>" class="w-8 h-8 glass rounded-lg flex items-center justify-center text-slate-400 hover:text-yellow-400 transition-colors" title="Edit">
+                  <i class="fas fa-edit text-xs"></i>
+                </a>
+                <form action="/planner/delete-trip/<%= trip._id %>" method="POST" onsubmit="return confirm('Delete this trip?')">
+                  <button type="submit" class="w-8 h-8 glass rounded-lg flex items-center justify-center text-slate-400 hover:text-red-400 transition-colors" title="Delete">
+                    <i class="fas fa-trash text-xs"></i>
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <% } %>
+  </div>
+
+  <!-- Hotels Table -->
+  <div class="glass-dark rounded-2xl overflow-hidden">
+    <div class="px-6 py-4 border-b border-white/8 flex items-center justify-between">
+      <h2 class="font-bold text-white flex items-center gap-2"><i class="fas fa-hotel text-purple-400"></i> My Hotels</h2>
+      <a href="/planner/add-hotel" class="btn-accent px-4 py-2 rounded-xl text-white text-xs font-semibold flex items-center gap-1">
+        <i class="fas fa-plus"></i> New Hotel
+      </a>
+    </div>
+    <% if (hotels.length === 0) { %>
+      <div class="text-center py-12 text-slate-400">
+        <i class="fas fa-hotel text-4xl mb-3 block text-slate-600"></i>
+        No hotels yet. <a href="/planner/add-hotel" class="text-sky-400 hover:underline">Add your first hotel</a>
+      </div>
+    <% } else { %>
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead><tr class="text-xs text-slate-400 uppercase tracking-wider border-b border-white/5">
+          <th class="px-6 py-3 text-left">Hotel</th>
+          <th class="px-6 py-3 text-left">Destination</th>
+          <th class="px-6 py-3 text-left">Category</th>
+          <th class="px-6 py-3 text-left">Price/Night</th>
+          <th class="px-6 py-3 text-left">Rating</th>
+          <th class="px-6 py-3 text-left">Actions</th>
+        </tr></thead>
+        <tbody>
+          <% hotels.forEach(hotel => { %>
+          <tr class="table-row border-b border-white/5">
+            <td class="px-6 py-4">
+              <div class="font-semibold text-white text-sm"><%= hotel.name %></div>
+              <div class="text-xs text-slate-500"><%= hotel.location %></div>
+            </td>
+            <td class="px-6 py-4 text-slate-300 text-sm"><%= hotel.destination %></td>
+            <td class="px-6 py-4">
+              <span class="badge <%= hotel.category==='budget'?'bg-green-500/20 text-green-400':hotel.category==='luxury'?'bg-purple-500/20 text-purple-400':'bg-sky-500/20 text-sky-400' %>"><%= hotel.category %></span>
+            </td>
+            <td class="px-6 py-4 text-white font-medium text-sm">₹<%= hotel.pricePerNight.toLocaleString() %></td>
+            <td class="px-6 py-4 text-yellow-400 text-sm"><i class="fas fa-star mr-1"></i><%= hotel.rating %></td>
+            <td class="px-6 py-4">
+              <div class="flex gap-2">
+                <a href="/planner/edit-hotel/<%= hotel._id %>" class="w-8 h-8 glass rounded-lg flex items-center justify-center text-slate-400 hover:text-yellow-400 transition-colors">
+                  <i class="fas fa-edit text-xs"></i>
+                </a>
+                <form action="/planner/delete-hotel/<%= hotel._id %>" method="POST" onsubmit="return confirm('Delete this hotel?')">
+                  <button class="w-8 h-8 glass rounded-lg flex items-center justify-center text-slate-400 hover:text-red-400 transition-colors">
+                    <i class="fas fa-trash text-xs"></i>
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <% } %>
+  </div>
+
+  <!-- Transport Table -->
+  <div class="glass-dark rounded-2xl overflow-hidden">
+    <div class="px-6 py-4 border-b border-white/8 flex items-center justify-between">
+      <h2 class="font-bold text-white flex items-center gap-2"><i class="fas fa-bus-alt text-blue-400"></i> My Transport Options</h2>
+      <a href="/planner/add-transport" class="glass px-4 py-2 rounded-xl text-white text-xs font-semibold flex items-center gap-1 hover:bg-white/10 transition-all">
+        <i class="fas fa-plus"></i> New Transport
+      </a>
+    </div>
+    <% if (transports.length === 0) { %>
+      <div class="text-center py-12 text-slate-400">
+        <i class="fas fa-route text-4xl mb-3 block text-slate-600"></i>
+        No transport yet. <a href="/planner/add-transport" class="text-sky-400 hover:underline">Add transport options</a>
+      </div>
+    <% } else { %>
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead><tr class="text-xs text-slate-400 uppercase tracking-wider border-b border-white/5">
+          <th class="px-6 py-3 text-left">Name</th>
+          <th class="px-6 py-3 text-left">Type</th>
+          <th class="px-6 py-3 text-left">Route</th>
+          <th class="px-6 py-3 text-left">Duration</th>
+          <th class="px-6 py-3 text-left">Cost</th>
+          <th class="px-6 py-3 text-left">Actions</th>
+        </tr></thead>
+        <tbody>
+          <% const tIcons={flight:'✈️',train:'🚆',bus:'🚌',cab:'🚕','bike-rental':'🏍️','car-rental':'🚗',ferry:'⛵'} %>
+          <% transports.forEach(t => { %>
+          <tr class="table-row border-b border-white/5">
+            <td class="px-6 py-4">
+              <div class="font-semibold text-white text-sm"><%= t.name %></div>
+              <div class="text-xs text-slate-500"><%= t.destination %></div>
+            </td>
+            <td class="px-6 py-4 text-sm"><span class="glass px-2 py-1 rounded-lg"><%= tIcons[t.type]||'🚌' %> <%= t.type %></span></td>
+            <td class="px-6 py-4 text-slate-300 text-sm"><%= t.from %> → <%= t.to %></td>
+            <td class="px-6 py-4 text-slate-300 text-sm"><%= t.duration %></td>
+            <td class="px-6 py-4 text-white font-medium text-sm">₹<%= t.cost.toLocaleString() %></td>
+            <td class="px-6 py-4">
+              <div class="flex gap-2">
+                <a href="/planner/edit-transport/<%= t._id %>" class="w-8 h-8 glass rounded-lg flex items-center justify-center text-slate-400 hover:text-yellow-400 transition-colors">
+                  <i class="fas fa-edit text-xs"></i>
+                </a>
+                <form action="/planner/delete-transport/<%= t._id %>" method="POST" onsubmit="return confirm('Delete this?')">
+                  <button class="w-8 h-8 glass rounded-lg flex items-center justify-center text-slate-400 hover:text-red-400 transition-colors">
+                    <i class="fas fa-trash text-xs"></i>
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <% } %>
+  </div>
+
+  <!-- Recent Bookings -->
+  <div class="glass-dark rounded-2xl overflow-hidden">
+    <div class="px-6 py-4 border-b border-white/8">
+      <h2 class="font-bold text-white flex items-center gap-2"><i class="fas fa-receipt text-green-400"></i> Recent Bookings</h2>
+    </div>
+    <% if (bookings.length === 0) { %>
+      <div class="text-center py-12 text-slate-500">No bookings yet</div>
+    <% } else { %>
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead><tr class="text-xs text-slate-400 uppercase tracking-wider border-b border-white/5">
+          <th class="px-6 py-3 text-left">Customer</th>
+          <th class="px-6 py-3 text-left">Type</th>
+          <th class="px-6 py-3 text-left">Details</th>
+          <th class="px-6 py-3 text-left">Amount</th>
+          <th class="px-6 py-3 text-left">Status</th>
+          <th class="px-6 py-3 text-left">Date</th>
+        </tr></thead>
+        <tbody>
+          <% bookings.forEach(b => { %>
+          <tr class="table-row border-b border-white/5">
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
+                  <%= b.user && b.user.name ? b.user.name.charAt(0).toUpperCase() : '?' %>
+                </div>
+                <span class="text-white text-sm font-medium"><%= b.user ? b.user.name : 'N/A' %></span>
+              </div>
+            </td>
+            <td class="px-6 py-4">
+              <span class="badge <%= b.bookingType==='hotel'?'bg-purple-500/20 text-purple-400':b.bookingType==='transport'?'bg-blue-500/20 text-blue-400':'bg-sky-500/20 text-sky-400' %>"><%= b.bookingType %></span>
+            </td>
+            <td class="px-6 py-4 text-slate-300 text-sm">
+              <% if (b.bookingType==='trip' && b.trip) { %><%= b.trip.title %>
+              <% } else if (b.bookingType==='hotel' && b.hotel) { %><%= b.hotel.name %>
+              <% } else if (b.bookingType==='transport' && b.transport) { %><%= b.transport.name %>
+              <% } else { %>—<% } %>
+            </td>
+            <td class="px-6 py-4 text-white font-semibold text-sm">₹<%= b.totalCost.toLocaleString() %></td>
+            <td class="px-6 py-4">
+              <span class="badge <%= b.status==='confirmed'?'bg-green-500/20 text-green-400':b.status==='cancelled'?'bg-red-500/20 text-red-400':'bg-yellow-500/20 text-yellow-400' %>">
+                <%= b.status %>
+              </span>
+            </td>
+            <td class="px-6 py-4 text-slate-400 text-xs"><%= new Date(b.createdAt).toLocaleDateString('en-IN') %></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
+</body>
+</html>

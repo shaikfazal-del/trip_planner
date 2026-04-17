@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { 50:'#f0f9ff', 100:'#e0f2fe', 500:'#0ea5e9', 600:'#0284c7', 700:'#0369a1', 900:'#0c4a6e' },
+            accent: { 400:'#fb923c', 500:'#f97316', 600:'#ea580c' },
+            dark: { 800:'#1e293b', 900:'#0f172a', 950:'#020617' }
+          },
+          fontFamily: { sans: ['Inter','sans-serif'], display: ['Playfair Display','serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .glass { background: rgba(255,255,255,0.08); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15); }
+    .glass-dark { background: rgba(15,23,42,0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
+    .gradient-text { background: linear-gradient(135deg,#38bdf8,#f97316); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero-gradient { background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0c4a6e 100%); }
+    .card-hover { transition: all 0.3s ease; }
+    .card-hover:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+    .btn-primary { background: linear-gradient(135deg,#0ea5e9,#0369a1); transition: all 0.3s ease; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(14,165,233,0.4); }
+    .btn-accent { background: linear-gradient(135deg,#f97316,#ea580c); transition: all 0.3s ease; }
+    .btn-accent:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(249,115,22,0.4); }
+    .nav-link { position: relative; }
+    .nav-link::after { content:''; position:absolute; bottom:-2px; left:0; width:0; height:2px; background:linear-gradient(90deg,#38bdf8,#f97316); transition:width 0.3s; }
+    .nav-link:hover::after { width:100%; }
+    input, select, textarea { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #e2e8f0; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #0ea5e9; box-shadow: 0 0 0 3px rgba(14,165,233,0.2); }
+    select option { background: #1e293b; color: #e2e8f0; }
+    .badge { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 999px; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #0ea5e9; border-radius: 3px; }
+  </style>
+</head>
+<body class="bg-dark-950 text-slate-100 min-h-screen">
+
+<!-- Navbar -->
+<nav class="glass-dark sticky top-0 z-50 px-6 py-4">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2 group">
+      <div class="w-9 h-9 rounded-xl btn-primary flex items-center justify-center">
+        <i class="fas fa-plane-departure text-white text-sm"></i>
+      </div>
+      <span class="font-display text-xl font-bold gradient-text">WanderPlan</span>
+    </a>
+    <div class="hidden md:flex items-center gap-6">
+      <% if (user) { %>
+        <% if (user.role === 'planner') { %>
+          <a href="/planner/dashboard" class="nav-link text-slate-300 hover:text-white text-sm font-medium transition-colors">Dashboard</a>
+          <a href="/planner/add-trip" class="nav-link text-slate-300 hover:text-white text-sm font-medium transition-colors">Add Trip</a>
+          <a href="/planner/add-hotel" class="nav-link text-slate-300 hover:text-white text-sm font-medium transition-colors">Add Hotel</a>
+          <a href="/planner/add-transport" class="nav-link text-slate-300 hover:text-white text-sm font-medium transition-colors">Add Transport</a>
+        <% } else { %>
+          <a href="/traveler/home" class="nav-link text-slate-300 hover:text-white text-sm font-medium transition-colors">Home</a>
+          <a href="/traveler/trips" class="nav-link text-slate-300 hover:text-white text-sm font-medium transition-colors">Browse Trips</a>
+          <a href="/traveler/plan-trip" class="nav-link text-slate-300 hover:text-white text-sm font-medium transition-colors">Plan Trip</a>
+          <a href="/traveler/bookings" class="nav-link text-slate-300 hover:text-white text-sm font-medium transition-colors">My Bookings</a>
+        <% } %>
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2 glass px-3 py-1.5 rounded-full">
+            <div class="w-6 h-6 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-xs font-bold">
+              <%= user.name.charAt(0).toUpperCase() %>
+            </div>
+            <span class="text-xs text-slate-300"><%= user.name.split(' ')[0] %></span>
+            <span class="badge <%= user.role === 'planner' ? 'bg-amber-500/20 text-amber-400' : 'bg-sky-500/20 text-sky-400' %>"><%= user.role %></span>
+          </div>
+          <a href="/auth/logout" class="text-slate-400 hover:text-red-400 text-sm transition-colors"><i class="fas fa-sign-out-alt"></i></a>
+        </div>
+      <% } else { %>
+        <a href="/traveler/trips" class="nav-link text-slate-300 hover:text-white text-sm font-medium transition-colors">Browse Trips</a>
+        <a href="/traveler/plan-trip" class="nav-link text-slate-300 hover:text-white text-sm font-medium transition-colors">Plan Trip</a>
+        <a href="/auth/login" class="text-slate-300 hover:text-white text-sm font-medium transition-colors">Login</a>
+        <a href="/auth/register" class="btn-primary px-5 py-2 rounded-xl text-white text-sm font-semibold">Get Started</a>
+      <% } %>
+    </div>
+    <!-- Mobile menu btn -->
+    <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="md:hidden text-slate-300">
+      <i class="fas fa-bars text-lg"></i>
+    </button>
+  </div>
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="hidden md:hidden mt-4 space-y-2 pb-3">
+    <% if (user) { %>
+      <% if (user.role === 'planner') { %>
+        <a href="/planner/dashboard" class="block px-4 py-2 text-slate-300 text-sm">Dashboard</a>
+        <a href="/planner/add-trip" class="block px-4 py-2 text-slate-300 text-sm">Add Trip</a>
+        <a href="/planner/add-hotel" class="block px-4 py-2 text-slate-300 text-sm">Add Hotel</a>
+        <a href="/planner/add-transport" class="block px-4 py-2 text-slate-300 text-sm">Add Transport</a>
+      <% } else { %>
+        <a href="/traveler/home" class="block px-4 py-2 text-slate-300 text-sm">Home</a>
+        <a href="/traveler/trips" class="block px-4 py-2 text-slate-300 text-sm">Browse Trips</a>
+        <a href="/traveler/plan-trip" class="block px-4 py-2 text-slate-300 text-sm">Plan Trip</a>
+        <a href="/traveler/bookings" class="block px-4 py-2 text-slate-300 text-sm">My Bookings</a>
+      <% } %>
+      <a href="/auth/logout" class="block px-4 py-2 text-red-400 text-sm">Logout</a>
+    <% } else { %>
+      <a href="/auth/login" class="block px-4 py-2 text-slate-300 text-sm">Login</a>
+      <a href="/auth/register" class="block px-4 py-2 text-sky-400 text-sm">Register</a>
+    <% } %>
+  </div>
+</nav>
+
+<!-- Flash Messages -->
+<% if (locals.messages) { %>
+  <% if (messages.success && messages.success.length > 0) { %>
+    <div id="flash-success" class="fixed top-20 right-4 z-50 glass px-5 py-3 rounded-xl border border-green-500/30 text-green-400 text-sm font-medium flex items-center gap-2 shadow-lg">
+      <i class="fas fa-check-circle"></i> <%= messages.success[0] %>
+    </div>
+    <script>setTimeout(()=>{ const el=document.getElementById('flash-success'); if(el) el.remove(); },4000);</script>
+  <% } %>
+  <% if (messages.error && messages.error.length > 0) { %>
+    <div id="flash-error" class="fixed top-20 right-4 z-50 glass px-5 py-3 rounded-xl border border-red-500/30 text-red-400 text-sm font-medium flex items-center gap-2 shadow-lg">
+      <i class="fas fa-exclamation-circle"></i> <%= messages.error[0] %>
+    </div>
+    <script>setTimeout(()=>{ const el=document.getElementById('flash-error'); if(el) el.remove(); },4000);</script>
+  <% } %>
+<% } %>
+
+<%- body %>
+
+<!-- Footer -->
+<footer class="glass-dark mt-20 px-6 py-10">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div>
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-8 h-8 rounded-lg btn-primary flex items-center justify-center">
+            <i class="fas fa-plane-departure text-white text-xs"></i>
+          </div>
+          <span class="font-display text-lg font-bold gradient-text">WanderPlan</span>
+        </div>
+        <p class="text-slate-400 text-sm leading-relaxed">Your AI-powered travel companion. Plan, book, and explore the world smarter.</p>
+      </div>
+      <div>
+        <h4 class="text-white font-semibold mb-3 text-sm">Explore</h4>
+        <div class="space-y-2">
+          <a href="/traveler/trips" class="block text-slate-400 hover:text-sky-400 text-sm transition-colors">Browse Trips</a>
+          <a href="/traveler/plan-trip" class="block text-slate-400 hover:text-sky-400 text-sm transition-colors">Plan Your Trip</a>
+          <a href="/traveler/bookings" class="block text-slate-400 hover:text-sky-400 text-sm transition-colors">My Bookings</a>
+        </div>
+      </div>
+      <div>
+        <h4 class="text-white font-semibold mb-3 text-sm">Destinations</h4>
+        <div class="space-y-2">
+          <span class="block text-slate-400 text-sm">🏖️ Goa</span>
+          <span class="block text-slate-400 text-sm">🏔️ Manali</span>
+          <span class="block text-slate-400 text-sm">🌿 Kerala</span>
+          <span class="block text-slate-400 text-sm">🏰 Rajasthan</span>
+        </div>
+      </div>
+      <div>
+        <h4 class="text-white font-semibold mb-3 text-sm">Account</h4>
+        <div class="space-y-2">
+          <a href="/auth/login" class="block text-slate-400 hover:text-sky-400 text-sm transition-colors">Login</a>
+          <a href="/auth/register" class="block text-slate-400 hover:text-sky-400 text-sm transition-colors">Register</a>
+        </div>
+      </div>
+    </div>
+    <div class="border-t border-white/10 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+      <p class="text-slate-500 text-sm">© 2024 WanderPlan. All rights reserved.</p>
+      <div class="flex gap-4">
+        <a href="#" class="text-slate-500 hover:text-sky-400 transition-colors"><i class="fab fa-instagram"></i></a>
+        <a href="#" class="text-slate-500 hover:text-sky-400 transition-colors"><i class="fab fa-twitter"></i></a>
+        <a href="#" class="text-slate-500 hover:text-sky-400 transition-colors"><i class="fab fa-facebook"></i></a>
+      </div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <script>tailwind.config={theme:{extend:{colors:{primary:{500:'#0ea5e9',600:'#0284c7',700:'#0369a1'},accent:{500:'#f97316',600:'#ea580c'},dark:{800:'#1e293b',900:'#0f172a',950:'#020617'}},fontFamily:{sans:['Inter','sans-serif'],display:['Playfair Display','serif']}}}}</script>
+  <style>
+    body{font-family:'Inter',sans-serif;}
+    .glass{background:rgba(255,255,255,0.07);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.12);}
+    .glass-dark{background:rgba(15,23,42,0.85);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.08);}
+    .gradient-text{background:linear-gradient(135deg,#38bdf8,#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .btn-primary{background:linear-gradient(135deg,#0ea5e9,#0369a1);transition:all 0.3s;}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(14,165,233,0.45);}
+    .nav-link{position:relative;}.nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:linear-gradient(90deg,#38bdf8,#f97316);transition:width 0.3s;}.nav-link:hover::after{width:100%;}
+    input,select,textarea{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#e2e8f0;}
+    input:focus,select:focus,textarea:focus{outline:none;border-color:#0ea5e9;box-shadow:0 0 0 3px rgba(14,165,233,0.2);}
+    select option{background:#1e293b;}
+    label.form-label{display:block;font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#94a3b8;margin-bottom:0.5rem;}
+    ::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:#0f172a;}::-webkit-scrollbar-thumb{background:#0ea5e9;border-radius:3px;}
+  </style>
+</head>
+<body class="bg-dark-950 text-slate-100 min-h-screen">
+<%- include('../partials/navbar') %>
+<%- include('../partials/flash') %>
+
+<div class="max-w-3xl mx-auto px-6 py-10">
+  <div class="flex items-center gap-3 mb-8">
+    <a href="/planner/dashboard" class="glass w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-white transition-colors">
+      <i class="fas fa-arrow-left text-sm"></i>
+    </a>
+    <div>
+      <h1 class="font-display text-3xl font-bold text-white"><%= hotel ? 'Edit' : 'Add New' %> <span class="gradient-text">Hotel</span></h1>
+      <p class="text-slate-400 text-sm mt-1">Fill in the details to <%= hotel ? 'update' : 'list' %> a hotel</p>
+    </div>
+  </div>
+
+  <% if (messages.error && messages.error.length > 0) { %>
+    <div class="mb-6 glass px-4 py-3 rounded-xl border border-red-500/30 text-red-400 text-sm flex items-center gap-2">
+      <i class="fas fa-exclamation-circle"></i> <%= messages.error[0] %>
+    </div>
+  <% } %>
+
+  <form action="<%= hotel ? '/planner/edit-hotel/'+hotel._id : '/planner/add-hotel' %>" method="POST" class="space-y-6">
+
+    <!-- Basic Info -->
+    <div class="glass-dark rounded-2xl p-6">
+      <h2 class="text-lg font-bold text-white mb-5 flex items-center gap-2"><i class="fas fa-hotel text-purple-400"></i> Hotel Details</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div class="md:col-span-2">
+          <label class="form-label">Hotel Name *</label>
+          <input type="text" name="name" required placeholder="e.g. The Leela Goa" value="<%= hotel ? hotel.name : '' %>" class="w-full px-4 py-3 rounded-xl text-sm"/>
+        </div>
+        <div>
+          <label class="form-label">Location / Area *</label>
+          <div class="relative">
+            <i class="fas fa-map-marker-alt absolute left-3 top-1/2 -translate-y-1/2 text-sky-400 text-sm"></i>
+            <input type="text" name="location" required placeholder="e.g. Calangute Beach, Goa" value="<%= hotel ? hotel.location : '' %>" class="w-full pl-9 pr-4 py-3 rounded-xl text-sm"/>
+          </div>
+        </div>
+        <div>
+          <label class="form-label">Destination City *</label>
+          <div class="relative">
+            <i class="fas fa-city absolute left-3 top-1/2 -translate-y-1/2 text-sky-400 text-sm"></i>
+            <input type="text" name="destination" required placeholder="e.g. Goa" value="<%= hotel ? hotel.destination : '' %>" class="w-full pl-9 pr-4 py-3 rounded-xl text-sm"/>
+          </div>
+        </div>
+        <div class="md:col-span-2">
+          <label class="form-label">Description</label>
+          <textarea name="description" rows="3" placeholder="Describe the hotel, ambiance, location benefits..." class="w-full px-4 py-3 rounded-xl text-sm resize-none"><%= hotel ? hotel.description : '' %></textarea>
+        </div>
+        <div>
+          <label class="form-label">Full Address</label>
+          <input type="text" name="address" placeholder="Full postal address" value="<%= hotel ? hotel.address : '' %>" class="w-full px-4 py-3 rounded-xl text-sm"/>
+        </div>
+        <div>
+          <label class="form-label">Contact Number</label>
+          <div class="relative">
+            <i class="fas fa-phone absolute left-3 top-1/2 -translate-y-1/2 text-sky-400 text-sm"></i>
+            <input type="text" name="contactNumber" placeholder="+91 98765 43210" value="<%= hotel ? hotel.contactNumber : '' %>" class="w-full pl-9 pr-4 py-3 rounded-xl text-sm"/>
+          </div>
+        </div>
+        <div>
+          <label class="form-label">Hotel Image URL</label>
+          <input type="url" name="image" placeholder="https://..." value="<%= hotel ? hotel.image : '' %>" class="w-full px-4 py-3 rounded-xl text-sm"/>
+        </div>
+        <div>
+          <label class="form-label">Total Rooms</label>
+          <input type="number" name="totalRooms" min="1" placeholder="50" value="<%= hotel ? hotel.totalRooms : '50' %>" class="w-full px-4 py-3 rounded-xl text-sm"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pricing & Rating -->
+    <div class="glass-dark rounded-2xl p-6">
+      <h2 class="text-lg font-bold text-white mb-5 flex items-center gap-2"><i class="fas fa-rupee-sign text-green-400"></i> Pricing & Rating</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div>
+          <label class="form-label">Price Per Night (₹) *</label>
+          <div class="relative">
+            <i class="fas fa-rupee-sign absolute left-3 top-1/2 -translate-y-1/2 text-sky-400 text-sm"></i>
+            <input type="number" name="pricePerNight" required min="0" placeholder="e.g. 3500" value="<%= hotel ? hotel.pricePerNight : '' %>" class="w-full pl-9 pr-4 py-3 rounded-xl text-sm"/>
+          </div>
+        </div>
+        <div>
+          <label class="form-label">Category *</label>
+          <select name="category" class="w-full px-4 py-3 rounded-xl text-sm">
+            <option value="budget" <%= hotel && hotel.category==='budget'?'selected':'' %>>💰 Budget</option>
+            <option value="mid-range" <%= !hotel || hotel.category==='mid-range'?'selected':'' %>>⭐ Mid-Range</option>
+            <option value="luxury" <%= hotel && hotel.category==='luxury'?'selected':'' %>>👑 Luxury</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Rating (1–5)</label>
+          <input type="number" name="rating" min="1" max="5" step="0.1" placeholder="e.g. 4.2" value="<%= hotel ? hotel.rating : '4.0' %>" class="w-full px-4 py-3 rounded-xl text-sm"/>
+        </div>
+      </div>
+      <div class="mt-5">
+        <label class="form-label">Amenities (comma-separated)</label>
+        <input type="text" name="amenities" placeholder="Free WiFi, Swimming Pool, Gym, Restaurant, Parking, AC, Spa, Room Service" value="<%= hotel && hotel.amenities ? hotel.amenities.join(', ') : '' %>" class="w-full px-4 py-3 rounded-xl text-sm"/>
+        <p class="text-xs text-slate-500 mt-1">Separate each amenity with a comma: WiFi, Pool, Gym, Spa...</p>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <div class="flex gap-4">
+      <button type="submit" class="btn-primary px-8 py-3.5 rounded-xl text-white font-bold flex items-center gap-2">
+        <i class="fas fa-<%= hotel ? 'save' : 'plus' %>"></i> <%= hotel ? 'Update Hotel' : 'Add Hotel' %>
+      </button>
+      <a href="/planner/dashboard" class="glass px-6 py-3.5 rounded-xl text-slate-400 hover:text-white font-semibold transition-all">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>
+</body>
+</html>

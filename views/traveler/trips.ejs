@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <script>tailwind.config={theme:{extend:{colors:{primary:{500:'#0ea5e9',600:'#0284c7',700:'#0369a1'},accent:{500:'#f97316',600:'#ea580c'},dark:{800:'#1e293b',900:'#0f172a',950:'#020617'}},fontFamily:{sans:['Inter','sans-serif'],display:['Playfair Display','serif']}}}}</script>
+  <style>
+    body{font-family:'Inter',sans-serif;}
+    .glass{background:rgba(255,255,255,0.07);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.12);}
+    .glass-dark{background:rgba(15,23,42,0.8);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.08);}
+    .gradient-text{background:linear-gradient(135deg,#38bdf8,#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .card-hover{transition:all 0.35s ease;}
+    .card-hover:hover{transform:translateY(-6px);box-shadow:0 20px 40px rgba(0,0,0,0.3);}
+    .btn-primary{background:linear-gradient(135deg,#0ea5e9,#0369a1);transition:all 0.3s;}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(14,165,233,0.45);}
+    .nav-link{position:relative;}.nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:linear-gradient(90deg,#38bdf8,#f97316);transition:width 0.3s;}.nav-link:hover::after{width:100%;}
+    input,select{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#e2e8f0;}
+    input:focus,select:focus{outline:none;border-color:#0ea5e9;box-shadow:0 0 0 3px rgba(14,165,233,0.2);}
+    select option{background:#1e293b;}
+    .badge{display:inline-flex;align-items:center;padding:2px 10px;border-radius:999px;font-size:0.7rem;font-weight:600;text-transform:uppercase;}
+    ::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:#0f172a;}::-webkit-scrollbar-thumb{background:#0ea5e9;border-radius:3px;}
+  </style>
+</head>
+<body class="bg-dark-950 text-slate-100 min-h-screen">
+<%- include('../partials/navbar') %>
+<%- include('../partials/flash') %>
+
+<!-- Header -->
+<div class="glass-dark px-6 py-10 border-b border-white/5">
+  <div class="max-w-7xl mx-auto">
+    <h1 class="font-display text-4xl font-bold text-white mb-2">Browse <span class="gradient-text">Trips</span></h1>
+    <p class="text-slate-400">Discover amazing destinations across India</p>
+  </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-6 py-10">
+  <!-- Filters -->
+  <div class="glass-dark rounded-2xl p-6 mb-8">
+    <form action="/traveler/trips" method="GET" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div class="relative">
+        <i class="fas fa-map-marker-alt absolute left-3 top-1/2 -translate-y-1/2 text-sky-400 text-sm"></i>
+        <input type="text" name="destination" value="<%= query.destination || '' %>" placeholder="Destination" class="w-full pl-9 pr-3 py-2.5 rounded-xl text-sm"/>
+      </div>
+      <select name="budget" class="py-2.5 px-3 rounded-xl text-sm">
+        <option value="">All Budgets</option>
+        <option value="budget" <%= query.budget==='budget'?'selected':'' %>>Budget</option>
+        <option value="mid-range" <%= query.budget==='mid-range'?'selected':'' %>>Mid-Range</option>
+        <option value="luxury" <%= query.budget==='luxury'?'selected':'' %>>Luxury</option>
+      </select>
+      <select name="days" class="py-2.5 px-3 rounded-xl text-sm">
+        <option value="">Any Duration</option>
+        <option value="3" <%= query.days==='3'?'selected':'' %>>Up to 3 days</option>
+        <option value="5" <%= query.days==='5'?'selected':'' %>>Up to 5 days</option>
+        <option value="7" <%= query.days==='7'?'selected':'' %>>Up to 7 days</option>
+        <option value="14" <%= query.days==='14'?'selected':'' %>>Up to 14 days</option>
+      </select>
+      <select name="type" class="py-2.5 px-3 rounded-xl text-sm">
+        <option value="">All Types</option>
+        <option value="solo" <%= query.type==='solo'?'selected':'' %>>Solo</option>
+        <option value="family" <%= query.type==='family'?'selected':'' %>>Family</option>
+        <option value="friends" <%= query.type==='friends'?'selected':'' %>>Friends</option>
+        <option value="couple" <%= query.type==='couple'?'selected':'' %>>Couple</option>
+      </select>
+      <select name="sort" class="py-2.5 px-3 rounded-xl text-sm">
+        <option value="">Latest First</option>
+        <option value="rating" <%= query.sort==='rating'?'selected':'' %>>Top Rated</option>
+        <option value="price-low" <%= query.sort==='price-low'?'selected':'' %>>Price: Low→High</option>
+        <option value="price-high" <%= query.sort==='price-high'?'selected':'' %>>Price: High→Low</option>
+      </select>
+      <div class="flex gap-2">
+        <button type="submit" class="btn-primary flex-1 py-2.5 px-4 rounded-xl text-white text-sm font-semibold flex items-center justify-center gap-1">
+          <i class="fas fa-search"></i> Filter
+        </button>
+        <a href="/traveler/trips" class="glass py-2.5 px-3 rounded-xl text-slate-400 hover:text-white text-sm flex items-center transition-colors" title="Reset">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Results count -->
+  <p class="text-slate-400 text-sm mb-6"><span class="text-white font-semibold"><%= trips.length %></span> trips found</p>
+
+  <!-- Trips Grid -->
+  <% if (trips.length === 0) { %>
+    <div class="text-center py-20 glass rounded-3xl">
+      <i class="fas fa-search text-6xl text-slate-700 mb-4 block"></i>
+      <h3 class="text-white text-xl font-semibold mb-2">No trips found</h3>
+      <p class="text-slate-400 mb-6">Try adjusting your filters or search a different destination</p>
+      <a href="/traveler/trips" class="btn-primary px-6 py-3 rounded-xl text-white font-semibold inline-flex items-center gap-2">
+        <i class="fas fa-redo"></i> Clear Filters
+      </a>
+    </div>
+  <% } else { %>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <% trips.forEach(trip => { %>
+    <div class="glass rounded-2xl overflow-hidden card-hover group">
+      <div class="relative h-52 overflow-hidden">
+        <% if (trip.image) { %>
+          <img src="<%= trip.image %>" alt="<%= trip.destination %>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"/>
+        <% } else { %>
+          <div class="w-full h-full bg-gradient-to-br from-sky-900 via-dark-900 to-blue-950 flex items-center justify-center">
+            <% const icons={beach:'🏖️',adventure:'⛰️',heritage:'🏰',nature:'🌿',city:'🏙️'} %>
+            <span class="text-7xl opacity-50"><%= icons[trip.category]||'🗺️' %></span>
+          </div>
+        <% } %>
+        <div class="absolute inset-0 bg-gradient-to-t from-dark-950/80 via-transparent to-transparent"></div>
+        <div class="absolute top-3 left-3 flex gap-2 flex-wrap">
+          <span class="badge glass text-white"><i class="fas fa-tag mr-1"></i><%= trip.category %></span>
+        </div>
+        <div class="absolute top-3 right-3 glass px-2 py-1 rounded-lg text-xs text-yellow-400 flex items-center gap-1">
+          <i class="fas fa-star"></i> <%= trip.rating %>
+        </div>
+        <div class="absolute bottom-3 left-3">
+          <span class="badge <%= trip.budgetCategory==='budget'?'bg-green-500/30 text-green-300':trip.budgetCategory==='luxury'?'bg-purple-500/30 text-purple-300':'bg-sky-500/30 text-sky-300' %>">
+            <%= trip.budgetCategory %>
+          </span>
+        </div>
+      </div>
+      <div class="p-5">
+        <div class="flex items-start justify-between mb-3">
+          <div class="flex-1">
+            <h3 class="font-bold text-white text-lg leading-snug"><%= trip.title %></h3>
+            <p class="text-sky-400 text-sm flex items-center gap-1 mt-1">
+              <i class="fas fa-map-marker-alt"></i> <%= trip.destination %>
+            </p>
+          </div>
+          <div class="text-right ml-3">
+            <div class="text-lg font-bold text-white">₹<%= trip.budgetMin.toLocaleString() %></div>
+            <div class="text-xs text-slate-500">onwards</div>
+          </div>
+        </div>
+        <p class="text-slate-400 text-sm leading-relaxed mb-4 line-clamp-2"><%= trip.description %></p>
+        <div class="flex gap-3 text-xs text-slate-400 mb-4">
+          <span class="flex items-center gap-1"><i class="fas fa-clock text-sky-400"></i> <%= trip.days %> days</span>
+          <span class="flex items-center gap-1"><i class="fas fa-users text-sky-400"></i> <%= trip.travelType.join(', ') %></span>
+          <span class="flex items-center gap-1"><i class="fas fa-bookmark text-sky-400"></i> <%= trip.totalBookings %> booked</span>
+        </div>
+        <% if (trip.highlights && trip.highlights.length > 0) { %>
+        <div class="flex flex-wrap gap-1 mb-4">
+          <% trip.highlights.slice(0,3).forEach(h => { %>
+            <span class="glass px-2 py-0.5 rounded-full text-xs text-slate-300">✓ <%= h %></span>
+          <% }) %>
+        </div>
+        <% } %>
+        <a href="/traveler/trips/<%= trip._id %>" class="btn-primary w-full py-2.5 rounded-xl text-white text-sm font-semibold flex items-center justify-center gap-2">
+          View Details &amp; Book <i class="fas fa-arrow-right text-xs"></i>
+        </a>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>
+</body>
+</html>

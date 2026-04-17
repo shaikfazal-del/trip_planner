@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { 50:'#f0f9ff', 100:'#e0f2fe', 500:'#0ea5e9', 600:'#0284c7', 700:'#0369a1', 900:'#0c4a6e' },
+            accent: { 400:'#fb923c', 500:'#f97316', 600:'#ea580c' },
+            dark: { 800:'#1e293b', 900:'#0f172a', 950:'#020617' }
+          },
+          fontFamily: { sans: ['Inter','sans-serif'], display: ['Playfair Display','serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .glass { background: rgba(255,255,255,0.08); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15); }
+    .glass-dark { background: rgba(15,23,42,0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
+    .gradient-text { background: linear-gradient(135deg,#38bdf8,#f97316); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .btn-primary { background: linear-gradient(135deg,#0ea5e9,#0369a1); transition: all 0.3s ease; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(14,165,233,0.4); }
+    .btn-accent { background: linear-gradient(135deg,#f97316,#ea580c); transition: all 0.3s ease; }
+    .btn-accent:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(249,115,22,0.4); }
+    input, select { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: #e2e8f0; }
+    input:focus, select:focus { outline:none; border-color:#0ea5e9; box-shadow: 0 0 0 3px rgba(14,165,233,0.2); }
+    select option { background: #1e293b; }
+    .badge { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 999px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #0ea5e9; border-radius: 3px; }
+  </style>
+</head>
+<body class="bg-dark-950 text-slate-100 min-h-screen flex items-center justify-center relative overflow-hidden">
+
+<!-- Animated BG -->
+<div class="absolute inset-0 z-0">
+  <div class="absolute top-0 left-1/4 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl animate-pulse"></div>
+  <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl animate-pulse" style="animation-delay:1s"></div>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-900/20 rounded-full blur-3xl"></div>
+</div>
+
+<div class="relative z-10 w-full max-w-md px-4 py-8">
+  <!-- Logo -->
+  <div class="text-center mb-8">
+    <a href="/" class="inline-flex items-center gap-2 mb-4">
+      <div class="w-10 h-10 rounded-xl btn-primary flex items-center justify-center">
+        <i class="fas fa-plane-departure text-white"></i>
+      </div>
+      <span class="font-display text-2xl font-bold gradient-text">WanderPlan</span>
+    </a>
+    <h1 class="text-2xl font-bold text-white mb-1">Welcome Back!</h1>
+    <p class="text-slate-400 text-sm">Sign in to continue your journey ✈️</p>
+  </div>
+
+  <!-- Flash -->
+  <% if (messages.error && messages.error.length > 0) { %>
+    <div class="mb-4 glass px-4 py-3 rounded-xl border border-red-500/30 text-red-400 text-sm flex items-center gap-2">
+      <i class="fas fa-exclamation-circle"></i> <%= messages.error[0] %>
+    </div>
+  <% } %>
+  <% if (messages.success && messages.success.length > 0) { %>
+    <div class="mb-4 glass px-4 py-3 rounded-xl border border-green-500/30 text-green-400 text-sm flex items-center gap-2">
+      <i class="fas fa-check-circle"></i> <%= messages.success[0] %>
+    </div>
+  <% } %>
+
+  <!-- Card -->
+  <div class="glass-dark rounded-2xl p-8">
+    <form action="/auth/login" method="POST" class="space-y-5">
+      <!-- Role Toggle -->
+      <div>
+        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Login as</label>
+        <div class="grid grid-cols-2 gap-3">
+          <label class="cursor-pointer">
+            <input type="radio" name="role" value="traveler" class="hidden peer" checked/>
+            <div class="peer-checked:border-sky-400 peer-checked:bg-sky-500/10 border border-white/10 rounded-xl p-3 text-center transition-all">
+              <i class="fas fa-user text-sky-400 mb-1 block text-lg"></i>
+              <span class="text-xs font-semibold text-slate-300">Traveler</span>
+            </div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="role" value="planner" class="hidden peer"/>
+            <div class="peer-checked:border-amber-400 peer-checked:bg-amber-500/10 border border-white/10 rounded-xl p-3 text-center transition-all">
+              <i class="fas fa-map-marked-alt text-amber-400 mb-1 block text-lg"></i>
+              <span class="text-xs font-semibold text-slate-300">Trip Planner</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Email</label>
+        <div class="relative">
+          <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+          <input type="email" name="email" required placeholder="you@example.com" class="w-full pl-10 pr-4 py-3 rounded-xl text-sm"/>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Password</label>
+        <div class="relative">
+          <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+          <input type="password" name="password" id="password" required placeholder="••••••••" class="w-full pl-10 pr-10 py-3 rounded-xl text-sm"/>
+          <button type="button" onclick="togglePass()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300">
+            <i id="eye-icon" class="fas fa-eye text-sm"></i>
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary w-full py-3 rounded-xl text-white font-semibold text-sm flex items-center justify-center gap-2">
+        <i class="fas fa-sign-in-alt"></i> Sign In
+      </button>
+    </form>
+
+    <div class="mt-6 pt-6 border-t border-white/10 text-center">
+      <p class="text-slate-400 text-sm">Don't have an account?
+        <a href="/auth/register" class="text-sky-400 hover:text-sky-300 font-semibold ml-1 transition-colors">Create one</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Demo Credentials -->
+  <div class="mt-4 glass rounded-xl p-4 text-center">
+    <p class="text-xs text-slate-500 mb-2 font-semibold">🚀 DEMO CREDENTIALS</p>
+    <div class="grid grid-cols-2 gap-2 text-xs">
+      <div class="glass-dark rounded-lg p-2">
+        <div class="text-amber-400 font-semibold mb-1">Trip Planner</div>
+        <div class="text-slate-400">planner@demo.com</div>
+        <div class="text-slate-400">demo1234</div>
+      </div>
+      <div class="glass-dark rounded-lg p-2">
+        <div class="text-sky-400 font-semibold mb-1">Traveler</div>
+        <div class="text-slate-400">traveler@demo.com</div>
+        <div class="text-slate-400">demo1234</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function togglePass() {
+    const p = document.getElementById('password');
+    const i = document.getElementById('eye-icon');
+    if (p.type === 'password') { p.type = 'text'; i.classList.replace('fa-eye','fa-eye-slash'); }
+    else { p.type = 'password'; i.classList.replace('fa-eye-slash','fa-eye'); }
+  }
+  // Radio style toggle
+  document.querySelectorAll('input[name="role"]').forEach(r => {
+    r.addEventListener('change', () => {
+      document.querySelectorAll('input[name="role"]').forEach(other => {
+        other.nextElementSibling.style.borderColor = '';
+      });
+    });
+  });
+</script>
+</body>
+</html>

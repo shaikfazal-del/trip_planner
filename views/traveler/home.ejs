@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title %></title>
+  <meta name="description" content="WanderPlan - AI-powered travel planning. Discover amazing destinations, plan trips, book hotels and transport."/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { primary: { 50:'#f0f9ff',100:'#e0f2fe',500:'#0ea5e9',600:'#0284c7',700:'#0369a1',900:'#0c4a6e' }, accent: { 400:'#fb923c',500:'#f97316',600:'#ea580c' }, dark: { 800:'#1e293b',900:'#0f172a',950:'#020617' } }, fontFamily: { sans: ['Inter','sans-serif'], display: ['Playfair Display','serif'] } } }
+    }
+  </script>
+  <style>
+    body{font-family:'Inter',sans-serif;}
+    .glass{background:rgba(255,255,255,0.07);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.12);}
+    .glass-dark{background:rgba(15,23,42,0.8);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.08);}
+    .gradient-text{background:linear-gradient(135deg,#38bdf8,#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .hero-gradient{background:linear-gradient(135deg,#020617 0%,#0f172a 40%,#0c4a6e 100%);}
+    .card-hover{transition:all 0.35s ease;}
+    .card-hover:hover{transform:translateY(-8px);box-shadow:0 25px 50px rgba(0,0,0,0.4);}
+    .btn-primary{background:linear-gradient(135deg,#0ea5e9,#0369a1);transition:all 0.3s;}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(14,165,233,0.45);}
+    .btn-accent{background:linear-gradient(135deg,#f97316,#ea580c);transition:all 0.3s;}
+    .btn-accent:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(249,115,22,0.45);}
+    .nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:linear-gradient(90deg,#38bdf8,#f97316);transition:width 0.3s;}
+    .nav-link{position:relative;}
+    .nav-link:hover::after{width:100%;}
+    input,select{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#e2e8f0;}
+    input:focus,select:focus{outline:none;border-color:#0ea5e9;box-shadow:0 0 0 3px rgba(14,165,233,0.2);}
+    select option{background:#1e293b;}
+    .badge{display:inline-flex;align-items:center;padding:2px 10px;border-radius:999px;font-size:0.7rem;font-weight:600;text-transform:uppercase;}
+    ::-webkit-scrollbar{width:6px;}
+    ::-webkit-scrollbar-track{background:#0f172a;}
+    ::-webkit-scrollbar-thumb{background:#0ea5e9;border-radius:3px;}
+    @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+    .float{animation:float 4s ease-in-out infinite;}
+    .float-delay{animation:float 4s ease-in-out 1s infinite;}
+  </style>
+</head>
+<body class="bg-dark-950 text-slate-100 min-h-screen">
+
+<!-- Navbar -->
+<%- include('../partials/navbar') %>
+
+<!-- Flash -->
+<%- include('../partials/flash') %>
+
+<!-- HERO -->
+<section class="hero-gradient relative min-h-screen flex items-center overflow-hidden">
+  <div class="absolute inset-0">
+    <div class="absolute top-20 left-10 w-72 h-72 bg-sky-500/15 rounded-full blur-3xl animate-pulse"></div>
+    <div class="absolute bottom-20 right-10 w-96 h-96 bg-orange-500/12 rounded-full blur-3xl animate-pulse" style="animation-delay:2s"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-900/20 rounded-full blur-3xl"></div>
+    <!-- Floating icons -->
+    <div class="absolute top-32 right-20 float text-4xl opacity-20">✈️</div>
+    <div class="absolute bottom-40 left-20 float-delay text-3xl opacity-20">🌍</div>
+    <div class="absolute top-1/2 right-1/3 float text-2xl opacity-15" style="animation-delay:0.5s">🏖️</div>
+    <div class="absolute top-1/3 left-1/4 float-delay text-2xl opacity-15">⛵</div>
+  </div>
+  <div class="relative z-10 max-w-7xl mx-auto px-6 py-24 w-full">
+    <div class="max-w-3xl">
+      <div class="inline-flex items-center gap-2 glass px-4 py-2 rounded-full mb-6 text-sm text-sky-300">
+        <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+        AI-Powered Travel Planning
+      </div>
+      <h1 class="font-display text-5xl md:text-7xl font-bold text-white leading-tight mb-6">
+        Explore The World<br/>
+        <span class="gradient-text">Smarter & Better</span>
+      </h1>
+      <p class="text-slate-300 text-xl leading-relaxed mb-10 max-w-2xl">
+        Plan perfect trips with AI assistance. Discover destinations, book hotels, arrange transport — all in one place. Your dream vacation is just a click away.
+      </p>
+      <div class="flex flex-wrap gap-4">
+        <a href="/traveler/plan-trip" class="btn-accent px-8 py-4 rounded-2xl text-white font-bold text-base flex items-center gap-2">
+          <i class="fas fa-magic"></i> Plan My Trip
+        </a>
+        <a href="/traveler/trips" class="glass px-8 py-4 rounded-2xl text-white font-semibold text-base flex items-center gap-2 hover:bg-white/15 transition-all">
+          <i class="fas fa-compass"></i> Browse Destinations
+        </a>
+      </div>
+      <!-- Stats row -->
+      <div class="flex flex-wrap gap-8 mt-14">
+        <div>
+          <div class="text-3xl font-bold text-white">500+</div>
+          <div class="text-slate-400 text-sm">Destinations</div>
+        </div>
+        <div class="w-px bg-white/10"></div>
+        <div>
+          <div class="text-3xl font-bold text-white">50K+</div>
+          <div class="text-slate-400 text-sm">Happy Travelers</div>
+        </div>
+        <div class="w-px bg-white/10"></div>
+        <div>
+          <div class="text-3xl font-bold text-white">4.9★</div>
+          <div class="text-slate-400 text-sm">Average Rating</div>
+        </div>
+        <div class="w-px bg-white/10"></div>
+        <div>
+          <div class="text-3xl font-bold text-white">24/7</div>
+          <div class="text-slate-400 text-sm">Support</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUICK SEARCH -->
+<section class="relative -mt-10 z-20 max-w-5xl mx-auto px-6">
+  <div class="glass-dark rounded-3xl p-6 shadow-2xl">
+    <h3 class="text-white font-semibold mb-4 flex items-center gap-2"><i class="fas fa-search text-sky-400"></i> Quick Trip Search</h3>
+    <form action="/traveler/trips" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="relative">
+        <i class="fas fa-map-marker-alt absolute left-3 top-1/2 -translate-y-1/2 text-sky-400 text-sm"></i>
+        <input type="text" name="destination" placeholder="Where to?" class="w-full pl-9 pr-3 py-3 rounded-xl text-sm"/>
+      </div>
+      <select name="budget" class="py-3 px-3 rounded-xl text-sm">
+        <option value="">Any Budget</option>
+        <option value="budget">Budget (₹0–15K)</option>
+        <option value="mid-range">Mid-Range (₹15K–50K)</option>
+        <option value="luxury">Luxury (₹50K+)</option>
+      </select>
+      <select name="days" class="py-3 px-3 rounded-xl text-sm">
+        <option value="">Any Duration</option>
+        <option value="3">Up to 3 Days</option>
+        <option value="5">Up to 5 Days</option>
+        <option value="7">Up to 7 Days</option>
+        <option value="14">Up to 14 Days</option>
+      </select>
+      <button type="submit" class="btn-primary py-3 px-6 rounded-xl text-white font-semibold text-sm flex items-center justify-center gap-2">
+        <i class="fas fa-search"></i> Search Trips
+      </button>
+    </form>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="max-w-7xl mx-auto px-6 py-24">
+  <div class="text-center mb-14">
+    <div class="inline-flex items-center gap-2 glass px-4 py-2 rounded-full mb-4 text-sm text-sky-300">
+      <i class="fas fa-star text-yellow-400"></i> Why WanderPlan?
+    </div>
+    <h2 class="font-display text-4xl font-bold text-white mb-3">Everything You Need</h2>
+    <p class="text-slate-400 text-lg">From planning to booking, we've got you covered</p>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <% const features = [
+      { icon:'fas fa-brain', color:'sky', title:'AI Trip Planning', desc:'Get personalized itineraries based on your destination, budget, and preferences instantly.' },
+      { icon:'fas fa-hotel', color:'purple', title:'Hotel Booking', desc:'Find and book the perfect stay — from budget hostels to luxury resorts.' },
+      { icon:'fas fa-bus-alt', color:'green', title:'Transport Options', desc:'Compare buses, trains, flights, and cabs. Pick what suits your time and budget.' },
+      { icon:'fas fa-map-marked-alt', color:'orange', title:'Day-wise Itinerary', desc:'Detailed day-by-day plans with nearby attractions grouped to reduce travel time.' },
+      { icon:'fas fa-rupee-sign', color:'yellow', title:'Budget Tracker', desc:'Real-time cost breakdowns for accommodation, food, transport and activities.' },
+      { icon:'fas fa-comments', color:'pink', title:'Community Reviews', desc:'Read genuine reviews from fellow travelers to make informed decisions.' }
+    ] %>
+    <% features.forEach(f => { %>
+    <div class="glass rounded-2xl p-6 card-hover group">
+      <div class="w-12 h-12 rounded-xl bg-<%= f.color %>-500/15 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+        <i class="<%= f.icon %> text-<%= f.color %>-400 text-xl"></i>
+      </div>
+      <h3 class="text-white font-bold text-lg mb-2"><%= f.title %></h3>
+      <p class="text-slate-400 text-sm leading-relaxed"><%= f.desc %></p>
+    </div>
+    <% }) %>
+  </div>
+</section>
+
+<!-- FEATURED TRIPS -->
+<section class="max-w-7xl mx-auto px-6 pb-24">
+  <div class="flex justify-between items-end mb-10">
+    <div>
+      <div class="inline-flex items-center gap-2 glass px-4 py-2 rounded-full mb-3 text-sm text-sky-300">
+        <i class="fas fa-fire text-orange-400"></i> Popular Trips
+      </div>
+      <h2 class="font-display text-4xl font-bold text-white">Featured Destinations</h2>
+    </div>
+    <a href="/traveler/trips" class="hidden md:flex items-center gap-2 text-sky-400 hover:text-sky-300 font-medium transition-colors text-sm">
+      View All <i class="fas fa-arrow-right"></i>
+    </a>
+  </div>
+
+  <% if (featuredTrips.length === 0) { %>
+    <div class="text-center py-16 glass rounded-3xl">
+      <i class="fas fa-map-signs text-6xl text-slate-600 mb-4 block"></i>
+      <p class="text-slate-400 text-lg">No trips available yet.</p>
+      <p class="text-slate-500 text-sm mt-2">Check back soon or <a href="/auth/register" class="text-sky-400">sign up as a planner</a> to add trips.</p>
+    </div>
+  <% } else { %>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <% featuredTrips.forEach(trip => { %>
+    <div class="glass rounded-2xl overflow-hidden card-hover group cursor-pointer" onclick="window.location='/traveler/trips/<%= trip._id %>'">
+      <div class="relative h-48 overflow-hidden">
+        <% if (trip.image) { %>
+          <img src="<%= trip.image %>" alt="<%= trip.destination %>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"/>
+        <% } else { %>
+          <div class="w-full h-full bg-gradient-to-br from-sky-900 to-blue-950 flex items-center justify-center">
+            <% const icons = {beach:'🏖️',adventure:'⛰️',heritage:'🏰',nature:'🌿',city:'🏙️'} %>
+            <span class="text-6xl opacity-60"><%= icons[trip.category] || '🗺️' %></span>
+          </div>
+        <% } %>
+        <div class="absolute top-3 left-3 flex gap-2">
+          <span class="badge glass text-white"><%= trip.category %></span>
+          <span class="badge <%= trip.budgetCategory === 'budget' ? 'bg-green-500/20 text-green-400' : trip.budgetCategory === 'luxury' ? 'bg-purple-500/20 text-purple-400' : 'bg-sky-500/20 text-sky-400' %>"><%= trip.budgetCategory %></span>
+        </div>
+        <div class="absolute top-3 right-3 glass px-2 py-1 rounded-lg text-xs text-yellow-400 flex items-center gap-1">
+          <i class="fas fa-star text-yellow-400"></i> <%= trip.rating %>
+        </div>
+      </div>
+      <div class="p-5">
+        <div class="flex items-start justify-between mb-2">
+          <div>
+            <h3 class="font-bold text-white text-lg leading-tight"><%= trip.title %></h3>
+            <p class="text-sky-400 text-sm flex items-center gap-1 mt-1"><i class="fas fa-map-marker-alt"></i> <%= trip.destination %></p>
+          </div>
+          <div class="text-right">
+            <div class="text-lg font-bold text-white">₹<%= trip.budgetMin.toLocaleString() %></div>
+            <div class="text-xs text-slate-500">per person</div>
+          </div>
+        </div>
+        <p class="text-slate-400 text-sm leading-relaxed mb-4 line-clamp-2"><%= trip.description %></p>
+        <div class="flex items-center justify-between">
+          <div class="flex gap-3 text-xs text-slate-400">
+            <span><i class="fas fa-clock mr-1 text-sky-400"></i><%= trip.days %> days</span>
+            <span><i class="fas fa-users mr-1 text-sky-400"></i><%= trip.totalBookings %> booked</span>
+          </div>
+          <div class="btn-primary px-4 py-2 rounded-xl text-white text-xs font-semibold flex items-center gap-1">
+            View Details <i class="fas fa-arrow-right text-xs"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+  <% } %>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="glass-dark py-20">
+  <div class="max-w-5xl mx-auto px-6">
+    <div class="text-center mb-14">
+      <h2 class="font-display text-4xl font-bold text-white mb-3">How WanderPlan Works</h2>
+      <p class="text-slate-400">Start your adventure in 4 simple steps</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <% const steps = [
+        { num:'1', icon:'fas fa-user-plus', color:'sky', title:'Create Account', desc:'Sign up as a Traveler to start planning instantly' },
+        { num:'2', icon:'fas fa-magic', color:'purple', title:'Plan Your Trip', desc:'Enter destination, budget & preferences for AI suggestions' },
+        { num:'3', icon:'fas fa-hotel', color:'orange', title:'Book Hotels & Transport', desc:'Choose from curated options matching your budget' },
+        { num:'4', icon:'fas fa-plane-departure', color:'green', title:'Enjoy The Journey', desc:'Get your day-wise itinerary and travel worry-free' }
+      ] %>
+      <% steps.forEach((s, i) => { %>
+      <div class="relative text-center group">
+        <div class="w-16 h-16 rounded-2xl bg-<%= s.color %>-500/15 border border-<%= s.color %>-500/30 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+          <i class="<%= s.icon %> text-<%= s.color %>-400 text-2xl"></i>
+        </div>
+        <div class="absolute -top-2 -right-2 w-6 h-6 bg-<%= s.color %>-500 rounded-full text-white text-xs flex items-center justify-center font-bold"><%= s.num %></div>
+        <h3 class="text-white font-bold mb-2"><%= s.title %></h3>
+        <p class="text-slate-400 text-sm leading-relaxed"><%= s.desc %></p>
+        <% if (i < 3) { %>
+          <div class="hidden md:block absolute top-8 -right-1/2 w-full h-px border-t-2 border-dashed border-white/10 z-10"></div>
+        <% } %>
+      </div>
+      <% }) %>
+    </div>
+    <div class="text-center mt-12">
+      <a href="/auth/register" class="btn-accent px-8 py-4 rounded-2xl text-white font-bold inline-flex items-center gap-2">
+        <i class="fas fa-rocket"></i> Start Planning Now — It's Free!
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- DESTINATIONS GRID -->
+<section class="max-w-7xl mx-auto px-6 py-24">
+  <div class="text-center mb-12">
+    <h2 class="font-display text-4xl font-bold text-white mb-3">Top Destinations in India</h2>
+    <p class="text-slate-400">From beaches to mountains — find your perfect escape</p>
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <% const destList = [
+      { name:'Goa', emoji:'🏖️', tag:'Beach Paradise', color:'from-cyan-900' },
+      { name:'Manali', emoji:'🏔️', tag:'Mountain Adventure', color:'from-blue-900' },
+      { name:'Kerala', emoji:'🌿', tag:'Nature & Backwaters', color:'from-green-900' },
+      { name:'Rajasthan', emoji:'🏰', tag:'Royal Heritage', color:'from-amber-900' },
+      { name:'Andaman', emoji:'🐠', tag:'Island Bliss', color:'from-teal-900' },
+      { name:'Hampi', emoji:'🗿', tag:'Ancient Ruins', color:'from-orange-900' },
+      { name:'Darjeeling', emoji:'☕', tag:'Tea & Tranquility', color:'from-emerald-900' },
+      { name:'Varanasi', emoji:'🪔', tag:'Spiritual Journey', color:'from-yellow-900' }
+    ] %>
+    <% destList.forEach(d => { %>
+    <a href="/traveler/trips?destination=<%= d.name %>" class="group relative glass rounded-2xl p-6 card-hover overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-br <%= d.color %> to-dark-950 opacity-50"></div>
+      <div class="relative z-10">
+        <div class="text-4xl mb-3"><%= d.emoji %></div>
+        <h3 class="font-bold text-white text-lg"><%= d.name %></h3>
+        <p class="text-xs text-slate-400 mt-1"><%= d.tag %></p>
+        <div class="mt-3 flex items-center text-sky-400 text-xs font-medium group-hover:gap-2 gap-1 transition-all">
+          Explore <i class="fas fa-arrow-right text-xs"></i>
+        </div>
+      </div>
+    </a>
+    <% }) %>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>
+
+</body>
+</html>

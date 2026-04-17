@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <script>tailwind.config={theme:{extend:{colors:{primary:{500:'#0ea5e9',600:'#0284c7',700:'#0369a1'},accent:{500:'#f97316',600:'#ea580c'},dark:{800:'#1e293b',900:'#0f172a',950:'#020617'}},fontFamily:{sans:['Inter','sans-serif'],display:['Playfair Display','serif']}}}}</script>
+  <style>
+    body{font-family:'Inter',sans-serif;}
+    .glass{background:rgba(255,255,255,0.07);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.12);}
+    .glass-dark{background:rgba(15,23,42,0.85);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.08);}
+    .gradient-text{background:linear-gradient(135deg,#38bdf8,#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .btn-primary{background:linear-gradient(135deg,#0ea5e9,#0369a1);transition:all 0.3s;}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(14,165,233,0.45);}
+    .nav-link{position:relative;}.nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:linear-gradient(90deg,#38bdf8,#f97316);transition:width 0.3s;}.nav-link:hover::after{width:100%;}
+    input,select,textarea{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#e2e8f0;}
+    input:focus,select:focus,textarea:focus{outline:none;border-color:#0ea5e9;box-shadow:0 0 0 3px rgba(14,165,233,0.2);}
+    select option{background:#1e293b;}
+    label.form-label{display:block;font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#94a3b8;margin-bottom:0.5rem;}
+    ::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:#0f172a;}::-webkit-scrollbar-thumb{background:#0ea5e9;border-radius:3px;}
+  </style>
+</head>
+<body class="bg-dark-950 text-slate-100 min-h-screen">
+<%- include('../partials/navbar') %>
+<%- include('../partials/flash') %>
+
+<div class="max-w-4xl mx-auto px-6 py-10">
+  <div class="flex items-center gap-3 mb-8">
+    <a href="/planner/dashboard" class="glass w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-white transition-colors">
+      <i class="fas fa-arrow-left text-sm"></i>
+    </a>
+    <div>
+      <h1 class="font-display text-3xl font-bold text-white"><%= trip ? 'Edit' : 'Add New' %> <span class="gradient-text">Trip</span></h1>
+      <p class="text-slate-400 text-sm mt-1">Fill in the details to <%= trip ? 'update' : 'create' %> a trip package</p>
+    </div>
+  </div>
+
+  <% if (messages.error && messages.error.length > 0) { %>
+    <div class="mb-6 glass px-4 py-3 rounded-xl border border-red-500/30 text-red-400 text-sm flex items-center gap-2">
+      <i class="fas fa-exclamation-circle"></i> <%= messages.error[0] %>
+    </div>
+  <% } %>
+
+  <form action="<%= trip ? '/planner/edit-trip/'+trip._id : '/planner/add-trip' %>" method="POST" class="space-y-6" id="tripForm">
+
+    <!-- Basic Info -->
+    <div class="glass-dark rounded-2xl p-6">
+      <h2 class="text-lg font-bold text-white mb-5 flex items-center gap-2"><i class="fas fa-info-circle text-sky-400"></i> Basic Information</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div class="md:col-span-2">
+          <label class="form-label">Trip Title *</label>
+          <input type="text" name="title" required placeholder="e.g. Goa Beach Adventure 2024" value="<%= trip ? trip.title : '' %>" class="w-full px-4 py-3 rounded-xl text-sm"/>
+        </div>
+        <div>
+          <label class="form-label">Destination *</label>
+          <div class="relative">
+            <i class="fas fa-map-marker-alt absolute left-3 top-1/2 -translate-y-1/2 text-sky-400 text-sm"></i>
+            <input type="text" name="destination" required placeholder="e.g. Goa" value="<%= trip ? trip.destination : '' %>" class="w-full pl-9 pr-4 py-3 rounded-xl text-sm"/>
+          </div>
+        </div>
+        <div>
+          <label class="form-label">Number of Days *</label>
+          <div class="relative">
+            <i class="fas fa-calendar-alt absolute left-3 top-1/2 -translate-y-1/2 text-sky-400 text-sm"></i>
+            <input type="number" name="days" id="daysInput" required min="1" max="30" placeholder="e.g. 5" value="<%= trip ? trip.days : '' %>" class="w-full pl-9 pr-4 py-3 rounded-xl text-sm"/>
+          </div>
+        </div>
+        <div class="md:col-span-2">
+          <label class="form-label">Description *</label>
+          <textarea name="description" rows="3" required placeholder="Describe this trip package..." class="w-full px-4 py-3 rounded-xl text-sm resize-none"><%= trip ? trip.description : '' %></textarea>
+        </div>
+        <div>
+          <label class="form-label">Trip Image URL</label>
+          <input type="url" name="image" placeholder="https://..." value="<%= trip ? trip.image : '' %>" class="w-full px-4 py-3 rounded-xl text-sm"/>
+        </div>
+        <div>
+          <label class="form-label">Best Time to Visit</label>
+          <input type="text" name="bestTimeToVisit" placeholder="e.g. October to March" value="<%= trip ? trip.bestTimeToVisit : '' %>" class="w-full px-4 py-3 rounded-xl text-sm"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- Budget & Category -->
+    <div class="glass-dark rounded-2xl p-6">
+      <h2 class="text-lg font-bold text-white mb-5 flex items-center gap-2"><i class="fas fa-rupee-sign text-green-400"></i> Budget & Category</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div>
+          <label class="form-label">Min Budget (₹) *</label>
+          <input type="number" name="budgetMin" required min="0" placeholder="e.g. 15000" value="<%= trip ? trip.budgetMin : '' %>" class="w-full px-4 py-3 rounded-xl text-sm"/>
+        </div>
+        <div>
+          <label class="form-label">Max Budget (₹) *</label>
+          <input type="number" name="budgetMax" required min="0" placeholder="e.g. 35000" value="<%= trip ? trip.budgetMax : '' %>" class="w-full px-4 py-3 rounded-xl text-sm"/>
+        </div>
+        <div>
+          <label class="form-label">Budget Category *</label>
+          <select name="budgetCategory" class="w-full px-4 py-3 rounded-xl text-sm">
+            <option value="budget" <%= trip && trip.budgetCategory==='budget'?'selected':'' %>>Budget</option>
+            <option value="mid-range" <%= !trip || trip.budgetCategory==='mid-range'?'selected':'' %>>Mid-Range</option>
+            <option value="luxury" <%= trip && trip.budgetCategory==='luxury'?'selected':'' %>>Luxury</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Trip Category *</label>
+          <select name="category" class="w-full px-4 py-3 rounded-xl text-sm">
+            <option value="beach" <%= trip && trip.category==='beach'?'selected':'' %>>🏖️ Beach</option>
+            <option value="adventure" <%= trip && trip.category==='adventure'?'selected':'' %>>⛰️ Adventure</option>
+            <option value="heritage" <%= trip && trip.category==='heritage'?'selected':'' %>>🏰 Heritage</option>
+            <option value="nature" <%= !trip || trip.category==='nature'?'selected':'' %>>🌿 Nature</option>
+            <option value="city" <%= trip && trip.category==='city'?'selected':'' %>>🏙️ City</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preferences -->
+    <div class="glass-dark rounded-2xl p-6">
+      <h2 class="text-lg font-bold text-white mb-5 flex items-center gap-2"><i class="fas fa-sliders-h text-purple-400"></i> Travel Preferences</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="form-label">Travel Type (select all that apply)</label>
+          <div class="grid grid-cols-2 gap-2">
+            <% ['solo','family','friends','couple'].forEach(type => { %>
+            <label class="flex items-center gap-2 glass px-3 py-2.5 rounded-xl cursor-pointer hover:bg-white/5 transition-all">
+              <input type="checkbox" name="travelType" value="<%= type %>" class="accent-sky-500 w-4 h-4"
+                <%= trip && trip.travelType && trip.travelType.includes(type) ? 'checked' : '' %>/>
+              <span class="text-slate-200 text-sm capitalize"><%= type %></span>
+            </label>
+            <% }) %>
+          </div>
+        </div>
+        <div>
+          <label class="form-label">Food Preference</label>
+          <div class="grid grid-cols-1 gap-2">
+            <% ['veg','non-veg','any'].forEach(fp => { %>
+            <label class="flex items-center gap-2 glass px-3 py-2.5 rounded-xl cursor-pointer hover:bg-white/5 transition-all">
+              <input type="checkbox" name="foodPreference" value="<%= fp %>" class="accent-sky-500 w-4 h-4"
+                <%= trip && trip.foodPreference && trip.foodPreference.includes(fp) ? 'checked' : '' %>/>
+              <span class="text-slate-200 text-sm capitalize"><%= fp === 'non-veg' ? '🍗 Non-Veg' : fp === 'veg' ? '🥗 Veg' : '🍽️ Any' %></span>
+            </label>
+            <% }) %>
+          </div>
+        </div>
+      </div>
+      <div class="mt-5">
+        <label class="form-label">Trip Highlights (one per line)</label>
+        <textarea name="highlights" rows="4" placeholder="Sunset cruise at Goa beach&#10;Visit to Dudhsagar Falls&#10;Old Goa heritage walk&#10;Water sports at Calangute" class="w-full px-4 py-3 rounded-xl text-sm resize-none"><%= trip && trip.highlights ? trip.highlights.join('\n') : '' %></textarea>
+      </div>
+    </div>
+
+    <!-- Day-wise Itinerary -->
+    <div class="glass-dark rounded-2xl p-6">
+      <h2 class="text-lg font-bold text-white mb-2 flex items-center gap-2"><i class="fas fa-route text-sky-400"></i> Day-wise Itinerary</h2>
+      <p class="text-slate-400 text-sm mb-5">Enter the number of days above first, then fill in the itinerary below.</p>
+      <div id="itinerary-container" class="space-y-4">
+        <% if (trip && trip.itinerary && trip.itinerary.length > 0) { %>
+          <% trip.itinerary.forEach((day, i) => { %>
+          <div class="glass rounded-xl p-5">
+            <div class="font-semibold text-sky-400 mb-3 flex items-center gap-2">
+              <span class="w-7 h-7 rounded-full btn-primary flex items-center justify-center text-white text-xs"><%= day.day %></span>
+              Day <%= day.day %>
+            </div>
+            <div class="space-y-3">
+              <div>
+                <label class="form-label">Day Title</label>
+                <input type="text" name="day<%= day.day %>_title" placeholder="e.g. Arrival & Beach Exploration" value="<%= day.title %>" class="w-full px-4 py-2.5 rounded-xl text-sm"/>
+              </div>
+              <div>
+                <label class="form-label">Activities (one per line)</label>
+                <textarea name="day<%= day.day %>_activities" rows="3" placeholder="Morning beach walk&#10;Visit Fort Aguada&#10;Sunset at Arambol" class="w-full px-4 py-2.5 rounded-xl text-sm resize-none"><%= day.activities ? day.activities.join('\n') : '' %></textarea>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="form-label">Meals</label>
+                  <input type="text" name="day<%= day.day %>_meals" placeholder="Breakfast at hotel, Seafood lunch..." value="<%= day.meals %>" class="w-full px-4 py-2.5 rounded-xl text-sm"/>
+                </div>
+                <div>
+                  <label class="form-label">Notes</label>
+                  <input type="text" name="day<%= day.day %>_notes" placeholder="Carry sunscreen, wear comfortable shoes" value="<%= day.notes %>" class="w-full px-4 py-2.5 rounded-xl text-sm"/>
+                </div>
+              </div>
+            </div>
+          </div>
+          <% }) %>
+        <% } %>
+      </div>
+      <button type="button" onclick="generateDayFields()" class="mt-4 glass px-5 py-2.5 rounded-xl text-sky-400 hover:text-white hover:bg-sky-500/10 text-sm font-semibold transition-all flex items-center gap-2">
+        <i class="fas fa-sync-alt"></i> Generate Day Fields from Days Count
+      </button>
+    </div>
+
+    <!-- Submit -->
+    <div class="flex gap-4">
+      <button type="submit" class="btn-primary px-8 py-3.5 rounded-xl text-white font-bold flex items-center gap-2">
+        <i class="fas fa-<%= trip ? 'save' : 'plus' %>"></i> <%= trip ? 'Update Trip' : 'Create Trip' %>
+      </button>
+      <a href="/planner/dashboard" class="glass px-6 py-3.5 rounded-xl text-slate-400 hover:text-white font-semibold transition-all">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>
+<script>
+function generateDayFields() {
+  const days = parseInt(document.getElementById('daysInput').value);
+  if (!days || days < 1) { alert('Please enter the number of days first.'); return; }
+  const container = document.getElementById('itinerary-container');
+  container.innerHTML = '';
+  for (let i = 1; i <= days; i++) {
+    container.innerHTML += `
+      <div class="glass rounded-xl p-5">
+        <div class="font-semibold text-sky-400 mb-3 flex items-center gap-2">
+          <span class="w-7 h-7 rounded-full bg-gradient-to-br from-sky-500 to-blue-700 flex items-center justify-center text-white text-xs">${i}</span>
+          Day ${i}
+        </div>
+        <div class="space-y-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Day Title</label>
+            <input type="text" name="day${i}_title" placeholder="e.g. Arrival & Exploration" class="w-full px-4 py-2.5 rounded-xl text-sm" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#e2e8f0;"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Activities (one per line)</label>
+            <textarea name="day${i}_activities" rows="3" placeholder="Activity 1&#10;Activity 2&#10;Activity 3" class="w-full px-4 py-2.5 rounded-xl text-sm resize-none" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#e2e8f0;"></textarea>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Meals</label>
+              <input type="text" name="day${i}_meals" placeholder="Meals for the day" class="w-full px-4 py-2.5 rounded-xl text-sm" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#e2e8f0;"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Notes</label>
+              <input type="text" name="day${i}_notes" placeholder="Tips for the day" class="w-full px-4 py-2.5 rounded-xl text-sm" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#e2e8f0;"/>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<nav class="glass-dark sticky top-0 z-50 px-6 py-4">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2 group">
+      <div class="w-9 h-9 rounded-xl btn-primary flex items-center justify-center">
+        <i class="fas fa-plane-departure text-white text-sm"></i>
+      </div>
+      <span class="font-display text-xl font-bold gradient-text">WanderPlan</span>
+    </a>
+    <div class="hidden md:flex items-center gap-6">
+      <% if (user) { %>
+        <% if (user.role === 'planner') { %>
+          <a href="/planner/dashboard" class="nav-link text-slate-300 hover:text-white text-sm font-medium transition-colors">Dashboard</a>
+          <a href="/planner/add-trip" class="nav-link text-slate-300 hover:text-white text-sm font-medium transition-colors">Add Trip</a>
+          <a href="/planner/add-hotel" class="nav-link text-slate-300 hover:text-white text-sm font-medium transition-colors">Add Hotel</a>
+          <a href="/planner/add-transport" class="nav-link text-slate-300 hover:text-white text-sm font-medium transition-colors">Add Transport</a>
+        <% } else { %>
+          <a href="/traveler/home" class="nav-link text-slate-300 hover:text-white text-sm font-medium transition-colors">Home</a>
+          <a href="/traveler/trips" class="nav-link text-slate-300 hover:text-white text-sm font-medium transition-colors">Browse Trips</a>
+          <a href="/traveler/plan-trip" class="nav-link text-slate-300 hover:text-white text-sm font-medium transition-colors">Plan Trip</a>
+          <a href="/traveler/bookings" class="nav-link text-slate-300 hover:text-white text-sm font-medium transition-colors">My Bookings</a>
+        <% } %>
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2 glass px-3 py-1.5 rounded-full">
+            <div class="w-6 h-6 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-xs font-bold">
+              <%= user.name.charAt(0).toUpperCase() %>
+            </div>
+            <span class="text-xs text-slate-300"><%= user.name.split(' ')[0] %></span>
+            <span class="badge <%= user.role === 'planner' ? 'bg-amber-500/20 text-amber-400' : 'bg-sky-500/20 text-sky-400' %>"><%= user.role %></span>
+          </div>
+          <a href="/auth/logout" class="text-slate-400 hover:text-red-400 text-sm transition-colors" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+        </div>
+      <% } else { %>
+        <a href="/traveler/trips" class="nav-link text-slate-300 hover:text-white text-sm font-medium transition-colors">Browse Trips</a>
+        <a href="/traveler/plan-trip" class="nav-link text-slate-300 hover:text-white text-sm font-medium transition-colors">Plan Trip</a>
+        <a href="/auth/login" class="text-slate-300 hover:text-white text-sm font-medium transition-colors">Login</a>
+        <a href="/auth/register" class="btn-primary px-5 py-2 rounded-xl text-white text-sm font-semibold">Get Started</a>
+      <% } %>
+    </div>
+    <button onclick="document.getElementById('mob-nav').classList.toggle('hidden')" class="md:hidden text-slate-300">
+      <i class="fas fa-bars text-lg"></i>
+    </button>
+  </div>
+  <div id="mob-nav" class="hidden md:hidden mt-4 space-y-2 pb-3 border-t border-white/10 pt-4">
+    <% if (user) { %>
+      <% if (user.role === 'planner') { %>
+        <a href="/planner/dashboard" class="block px-2 py-2 text-slate-300 text-sm hover:text-white">📊 Dashboard</a>
+        <a href="/planner/add-trip" class="block px-2 py-2 text-slate-300 text-sm hover:text-white">✈️ Add Trip</a>
+        <a href="/planner/add-hotel" class="block px-2 py-2 text-slate-300 text-sm hover:text-white">🏨 Add Hotel</a>
+        <a href="/planner/add-transport" class="block px-2 py-2 text-slate-300 text-sm hover:text-white">🚌 Add Transport</a>
+      <% } else { %>
+        <a href="/traveler/home" class="block px-2 py-2 text-slate-300 text-sm hover:text-white">🏠 Home</a>
+        <a href="/traveler/trips" class="block px-2 py-2 text-slate-300 text-sm hover:text-white">🗺️ Browse Trips</a>
+        <a href="/traveler/plan-trip" class="block px-2 py-2 text-slate-300 text-sm hover:text-white">🤖 Plan Trip</a>
+        <a href="/traveler/bookings" class="block px-2 py-2 text-slate-300 text-sm hover:text-white">📋 My Bookings</a>
+      <% } %>
+      <a href="/auth/logout" class="block px-2 py-2 text-red-400 text-sm">🚪 Logout</a>
+    <% } else { %>
+      <a href="/auth/login" class="block px-2 py-2 text-slate-300 text-sm">🔑 Login</a>
+      <a href="/auth/register" class="block px-2 py-2 text-sky-400 text-sm">🚀 Register</a>
+    <% } %>
+  </div>
+</nav>

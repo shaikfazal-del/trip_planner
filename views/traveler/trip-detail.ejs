@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <script>tailwind.config={theme:{extend:{colors:{primary:{500:'#0ea5e9',600:'#0284c7',700:'#0369a1'},accent:{500:'#f97316',600:'#ea580c'},dark:{800:'#1e293b',900:'#0f172a',950:'#020617'}},fontFamily:{sans:['Inter','sans-serif'],display:['Playfair Display','serif']}}}}</script>
+  <style>
+    body{font-family:'Inter',sans-serif;}
+    .glass{background:rgba(255,255,255,0.07);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.12);}
+    .glass-dark{background:rgba(15,23,42,0.8);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.08);}
+    .gradient-text{background:linear-gradient(135deg,#38bdf8,#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .btn-primary{background:linear-gradient(135deg,#0ea5e9,#0369a1);transition:all 0.3s;}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(14,165,233,0.45);}
+    .btn-accent{background:linear-gradient(135deg,#f97316,#ea580c);transition:all 0.3s;}
+    .btn-accent:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(249,115,22,0.45);}
+    .nav-link{position:relative;}.nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:linear-gradient(90deg,#38bdf8,#f97316);transition:width 0.3s;}.nav-link:hover::after{width:100%;}
+    input,select,textarea{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#e2e8f0;}
+    input:focus,select:focus,textarea:focus{outline:none;border-color:#0ea5e9;box-shadow:0 0 0 3px rgba(14,165,233,0.2);}
+    select option{background:#1e293b;}
+    .badge{display:inline-flex;align-items:center;padding:2px 10px;border-radius:999px;font-size:0.7rem;font-weight:600;text-transform:uppercase;}
+    .day-card{border-left:3px solid #0ea5e9;transition:all 0.3s;}.day-card:hover{border-left-color:#f97316;}
+    ::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:#0f172a;}::-webkit-scrollbar-thumb{background:#0ea5e9;border-radius:3px;}
+    .star-rating input{display:none;}.star-rating label{font-size:1.5rem;cursor:pointer;color:#4b5563;transition:color 0.2s;}
+    .star-rating input:checked ~ label,.star-rating label:hover,.star-rating label:hover ~ label{color:#f59e0b;}
+  </style>
+</head>
+<body class="bg-dark-950 text-slate-100 min-h-screen">
+<%- include('../partials/navbar') %>
+<%- include('../partials/flash') %>
+
+<!-- Hero Banner -->
+<div class="relative h-80 overflow-hidden">
+  <% if (trip.image) { %>
+    <img src="<%= trip.image %>" alt="<%= trip.destination %>" class="w-full h-full object-cover"/>
+  <% } else { %>
+    <div class="w-full h-full bg-gradient-to-br from-sky-900 via-dark-900 to-blue-950 flex items-center justify-center">
+      <% const icons={beach:'🏖️',adventure:'⛰️',heritage:'🏰',nature:'🌿',city:'🏙️'} %>
+      <span class="text-9xl opacity-30"><%= icons[trip.category]||'🗺️' %></span>
+    </div>
+  <% } %>
+  <div class="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/50 to-transparent"></div>
+  <div class="absolute bottom-8 left-6 right-6 max-w-7xl mx-auto">
+    <div class="flex flex-wrap gap-2 mb-3">
+      <span class="badge glass text-white"><%= trip.category %></span>
+      <span class="badge <%= trip.budgetCategory==='budget'?'bg-green-500/30 text-green-300':trip.budgetCategory==='luxury'?'bg-purple-500/30 text-purple-300':'bg-sky-500/30 text-sky-300' %>"><%= trip.budgetCategory %></span>
+      <% trip.travelType.forEach(t => { %><span class="badge bg-white/10 text-white"><%= t %></span><% }) %>
+    </div>
+    <h1 class="font-display text-4xl md:text-5xl font-bold text-white mb-2"><%= trip.title %></h1>
+    <div class="flex flex-wrap items-center gap-4 text-sm text-slate-300">
+      <span><i class="fas fa-map-marker-alt text-sky-400 mr-1"></i><%= trip.destination %></span>
+      <span><i class="fas fa-clock text-sky-400 mr-1"></i><%= trip.days %> days</span>
+      <span><i class="fas fa-star text-yellow-400 mr-1"></i><%= avgRating %> (<%= reviews.length %> reviews)</span>
+      <span><i class="fas fa-users text-sky-400 mr-1"></i><%= trip.totalBookings %> booked</span>
+    </div>
+  </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-6 py-10">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+    <!-- Main Content -->
+    <div class="lg:col-span-2 space-y-8">
+
+      <!-- Description -->
+      <div class="glass-dark rounded-2xl p-6">
+        <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><i class="fas fa-info-circle text-sky-400"></i> About This Trip</h2>
+        <p class="text-slate-300 leading-relaxed mb-4"><%= trip.description %></p>
+        <% if (trip.bestTimeToVisit) { %>
+          <div class="glass px-4 py-3 rounded-xl flex items-center gap-3">
+            <i class="fas fa-calendar-alt text-sky-400 text-lg"></i>
+            <div><div class="text-xs text-slate-400 font-semibold uppercase">Best Time to Visit</div><div class="text-white text-sm"><%= trip.bestTimeToVisit %></div></div>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- Highlights -->
+      <% if (trip.highlights && trip.highlights.length > 0) { %>
+      <div class="glass-dark rounded-2xl p-6">
+        <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><i class="fas fa-star text-yellow-400"></i> Trip Highlights</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <% trip.highlights.forEach(h => { %>
+            <div class="flex items-center gap-3 glass px-4 py-3 rounded-xl">
+              <div class="w-6 h-6 rounded-full bg-sky-500/20 flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-check text-sky-400 text-xs"></i>
+              </div>
+              <span class="text-slate-200 text-sm"><%= h %></span>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Day-wise Itinerary -->
+      <% if (trip.itinerary && trip.itinerary.length > 0) { %>
+      <div class="glass-dark rounded-2xl p-6">
+        <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2"><i class="fas fa-route text-sky-400"></i> Day-wise Itinerary</h2>
+        <div class="space-y-4">
+          <% trip.itinerary.forEach((day, idx) => { %>
+          <div class="day-card glass px-5 py-4 rounded-xl ml-2" onclick="this.querySelector('.day-content').classList.toggle('hidden')" style="cursor:pointer">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full btn-primary flex items-center justify-center text-white text-xs font-bold flex-shrink-0"><%= day.day %></div>
+                <h3 class="font-semibold text-white"><%= day.title %></h3>
+              </div>
+              <i class="fas fa-chevron-down text-slate-400 text-sm transition-transform"></i>
+            </div>
+            <div class="day-content mt-4 space-y-2 <%= idx === 0 ? '' : 'hidden' %>">
+              <% if (day.activities && day.activities.length > 0) { %>
+                <% day.activities.forEach(act => { %>
+                  <div class="flex items-start gap-2 text-sm text-slate-300">
+                    <i class="fas fa-circle text-sky-400 text-xs mt-1.5 flex-shrink-0"></i> <%= act %>
+                  </div>
+                <% }) %>
+              <% } %>
+              <% if (day.meals) { %>
+                <div class="glass px-3 py-2 rounded-lg mt-2 text-xs flex items-center gap-2">
+                  <i class="fas fa-utensils text-orange-400"></i>
+                  <span class="text-slate-300"><strong class="text-orange-400">Meals:</strong> <%= day.meals %></span>
+                </div>
+              <% } %>
+              <% if (day.notes) { %>
+                <div class="glass px-3 py-2 rounded-lg text-xs flex items-center gap-2">
+                  <i class="fas fa-sticky-note text-yellow-400"></i>
+                  <span class="text-slate-300"><strong class="text-yellow-400">Note:</strong> <%= day.notes %></span>
+                </div>
+              <% } %>
+            </div>
+          </div>
+          <% }) %>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Hotels -->
+      <% if (hotels.length > 0) { %>
+      <div class="glass-dark rounded-2xl p-6">
+        <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><i class="fas fa-hotel text-sky-400"></i> Where to Stay</h2>
+        <div class="space-y-4">
+          <% hotels.forEach(hotel => { %>
+          <div class="glass rounded-xl overflow-hidden">
+            <div class="p-4">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center gap-2 flex-wrap mb-1">
+                    <h3 class="font-bold text-white"><%= hotel.name %></h3>
+                    <span class="badge <%= hotel.category==='budget'?'bg-green-500/20 text-green-400':hotel.category==='luxury'?'bg-purple-500/20 text-purple-400':'bg-sky-500/20 text-sky-400' %>"><%= hotel.category %></span>
+                  </div>
+                  <p class="text-sky-400 text-xs flex items-center gap-1 mb-2"><i class="fas fa-map-marker-alt"></i> <%= hotel.location %></p>
+                  <% if (hotel.amenities && hotel.amenities.length > 0) { %>
+                    <div class="flex flex-wrap gap-1">
+                      <% hotel.amenities.slice(0,4).forEach(a => { %>
+                        <span class="glass px-2 py-0.5 rounded-full text-xs text-slate-300"><%= a %></span>
+                      <% }) %>
+                    </div>
+                  <% } %>
+                </div>
+                <div class="text-right ml-4">
+                  <div class="text-yellow-400 text-sm mb-1"><i class="fas fa-star"></i> <%= hotel.rating %></div>
+                  <div class="text-lg font-bold text-white">₹<%= hotel.pricePerNight.toLocaleString() %></div>
+                  <div class="text-xs text-slate-500">per night</div>
+                </div>
+              </div>
+              <% if (user) { %>
+              <form action="/traveler/book" method="POST" class="mt-4 grid grid-cols-3 gap-2">
+                <input type="hidden" name="hotelId" value="<%= hotel._id %>"/>
+                <input type="hidden" name="bookingType" value="hotel"/>
+                <input type="date" name="checkIn" class="col-span-1 py-2 px-3 rounded-xl text-xs" required/>
+                <input type="date" name="checkOut" class="col-span-1 py-2 px-3 rounded-xl text-xs" required/>
+                <button type="submit" class="btn-primary py-2 px-3 rounded-xl text-white text-xs font-semibold">Book Now</button>
+              </form>
+              <% } else { %>
+              <a href="/auth/login" class="mt-3 btn-primary py-2 px-4 rounded-xl text-white text-xs font-semibold inline-flex items-center gap-1">
+                <i class="fas fa-lock"></i> Login to Book
+              </a>
+              <% } %>
+            </div>
+          </div>
+          <% }) %>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Transport -->
+      <% if (transports.length > 0) { %>
+      <div class="glass-dark rounded-2xl p-6">
+        <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><i class="fas fa-bus-alt text-sky-400"></i> Transport Options</h2>
+        <div class="space-y-3">
+          <% const tIcons={flight:'fas fa-plane',train:'fas fa-train',bus:'fas fa-bus-alt',cab:'fas fa-taxi','bike-rental':'fas fa-motorcycle','car-rental':'fas fa-car',ferry:'fas fa-ship'} %>
+          <% transports.forEach(t => { %>
+          <div class="glass rounded-xl p-4 flex items-center justify-between flex-wrap gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-sky-500/15 flex items-center justify-center">
+                <i class="<%= tIcons[t.type]||'fas fa-route' %> text-sky-400"></i>
+              </div>
+              <div>
+                <div class="font-semibold text-white text-sm"><%= t.name %></div>
+                <div class="text-xs text-slate-400"><%= t.from %> → <%= t.to %> · <%= t.duration %></div>
+                <% if (t.departure) { %><div class="text-xs text-slate-500">Dep: <%= t.departure %></div><% } %>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <div class="font-bold text-white">₹<%= t.cost.toLocaleString() %></div>
+                <div class="text-xs text-slate-500">per person</div>
+              </div>
+              <% if (user) { %>
+              <form action="/traveler/book" method="POST">
+                <input type="hidden" name="transportId" value="<%= t._id %>"/>
+                <input type="hidden" name="bookingType" value="transport"/>
+                <button type="submit" class="btn-primary py-2 px-4 rounded-xl text-white text-xs font-semibold">Book</button>
+              </form>
+              <% } else { %>
+              <a href="/auth/login" class="btn-primary py-2 px-4 rounded-xl text-white text-xs font-semibold">Login</a>
+              <% } %>
+            </div>
+          </div>
+          <% }) %>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Reviews -->
+      <div class="glass-dark rounded-2xl p-6">
+        <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+          <i class="fas fa-comments text-sky-400"></i> Reviews & Comments
+          <span class="badge glass text-slate-300 ml-2"><%= reviews.length %></span>
+        </h2>
+
+        <!-- Leave Review -->
+        <% if (user && user.role === 'traveler') { %>
+        <div class="glass rounded-xl p-5 mb-6">
+          <h3 class="text-sm font-semibold text-white mb-4">Leave a Review</h3>
+          <form action="/traveler/review" method="POST" class="space-y-4">
+            <input type="hidden" name="tripId" value="<%= trip._id %>"/>
+            <div>
+              <label class="block text-xs text-slate-400 mb-2 font-semibold">Rating</label>
+              <div class="star-rating flex flex-row-reverse justify-end gap-1">
+                <% for(let i=5;i>=1;i--) { %>
+                  <input type="radio" name="rating" value="<%= i %>" id="star<%= i %>" required/>
+                  <label for="star<%= i %>">★</label>
+                <% } %>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs text-slate-400 mb-2 font-semibold">Comment</label>
+              <textarea name="comment" rows="3" placeholder="Share your experience..." required class="w-full px-4 py-3 rounded-xl text-sm resize-none"></textarea>
+            </div>
+            <button type="submit" class="btn-primary px-6 py-2.5 rounded-xl text-white text-sm font-semibold">
+              <i class="fas fa-paper-plane mr-1"></i> Submit Review
+            </button>
+          </form>
+        </div>
+        <% } %>
+
+        <% if (reviews.length === 0) { %>
+          <div class="text-center py-8 text-slate-500">
+            <i class="fas fa-comment-slash text-4xl mb-3 block"></i>
+            <p>No reviews yet. Be the first to review!</p>
+          </div>
+        <% } else { %>
+        <div class="space-y-4">
+          <% reviews.forEach(r => { %>
+          <div class="glass rounded-xl p-4">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-xs font-bold text-white">
+                  <%= r.user.name.charAt(0).toUpperCase() %>
+                </div>
+                <span class="text-white text-sm font-semibold"><%= r.user.name %></span>
+              </div>
+              <div class="flex items-center gap-1">
+                <% for(let i=1;i<=5;i++) { %><span class="text-sm <%= i<=r.rating?'text-yellow-400':'text-slate-600' %>">★</span><% } %>
+              </div>
+            </div>
+            <p class="text-slate-300 text-sm leading-relaxed"><%= r.comment %></p>
+            <p class="text-slate-500 text-xs mt-2"><%= new Date(r.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) %></p>
+          </div>
+          <% }) %>
+        </div>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="space-y-6">
+      <!-- Book Trip Card -->
+      <div class="glass-dark rounded-2xl p-6 sticky top-24">
+        <div class="text-center mb-4">
+          <div class="text-3xl font-bold text-white">₹<%= trip.budgetMin.toLocaleString() %></div>
+          <div class="text-slate-400 text-sm">starting price per person</div>
+          <div class="text-slate-500 text-xs mt-1">Up to ₹<%= trip.budgetMax.toLocaleString() %> for premium</div>
+        </div>
+        <div class="flex items-center justify-center gap-2 mb-6">
+          <% for(let i=1;i<=5;i++) { %><span class="text-yellow-400 text-sm">★</span><% } %>
+          <span class="text-slate-400 text-sm">(<%= avgRating %>)</span>
+        </div>
+        <% if (user && user.role === 'traveler') { %>
+        <form action="/traveler/book" method="POST" class="space-y-3">
+          <input type="hidden" name="tripId" value="<%= trip._id %>"/>
+          <input type="hidden" name="bookingType" value="trip"/>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1 font-semibold">Number of Guests</label>
+            <input type="number" name="guests" value="1" min="1" max="20" class="w-full py-2.5 px-3 rounded-xl text-sm"/>
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1 font-semibold">Special Requests</label>
+            <input type="text" name="specialRequests" placeholder="Any special requirements..." class="w-full py-2.5 px-3 rounded-xl text-sm"/>
+          </div>
+          <button type="submit" class="btn-accent w-full py-3 rounded-xl text-white font-bold flex items-center justify-center gap-2">
+            <i class="fas fa-bookmark"></i> Book This Trip!
+          </button>
+        </form>
+        <% } else if (!user) { %>
+        <a href="/auth/login" class="btn-primary w-full py-3 rounded-xl text-white font-bold flex items-center justify-center gap-2">
+          <i class="fas fa-sign-in-alt"></i> Login to Book
+        </a>
+        <% } %>
+        <div class="mt-4 space-y-2">
+          <div class="flex items-center gap-2 text-xs text-slate-400"><i class="fas fa-check text-green-400 w-4"></i> Free cancellation (48hrs)</div>
+          <div class="flex items-center gap-2 text-xs text-slate-400"><i class="fas fa-check text-green-400 w-4"></i> Instant confirmation</div>
+          <div class="flex items-center gap-2 text-xs text-slate-400"><i class="fas fa-check text-green-400 w-4"></i> Expert trip planner support</div>
+        </div>
+      </div>
+
+      <!-- Quick Info -->
+      <div class="glass-dark rounded-2xl p-5">
+        <h3 class="font-semibold text-white mb-4 text-sm">Trip Summary</h3>
+        <div class="space-y-3">
+          <div class="flex items-center gap-3"><i class="fas fa-clock text-sky-400 w-5"></i><div><div class="text-xs text-slate-400">Duration</div><div class="text-white text-sm font-medium"><%= trip.days %> Days</div></div></div>
+          <div class="flex items-center gap-3"><i class="fas fa-map-marker-alt text-sky-400 w-5"></i><div><div class="text-xs text-slate-400">Destination</div><div class="text-white text-sm font-medium"><%= trip.destination %></div></div></div>
+          <div class="flex items-center gap-3"><i class="fas fa-users text-sky-400 w-5"></i><div><div class="text-xs text-slate-400">Travel Type</div><div class="text-white text-sm font-medium"><%= trip.travelType.join(', ') %></div></div></div>
+          <div class="flex items-center gap-3"><i class="fas fa-utensils text-sky-400 w-5"></i><div><div class="text-xs text-slate-400">Food Preference</div><div class="text-white text-sm font-medium"><%= trip.foodPreference.join(', ') %></div></div></div>
+          <div class="flex items-center gap-3"><i class="fas fa-tag text-sky-400 w-5"></i><div><div class="text-xs text-slate-400">Category</div><div class="text-white text-sm font-medium capitalize"><%= trip.category %></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('../partials/footer') %>
+</body>
+</html>
