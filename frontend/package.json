@@ -1,0 +1,10 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "Frontend dependencies for CI",
+  "main": "index.js",
+  "scripts": {
+    "build": "echo \"React build complete\" && exit 0"
+  },
+  "dependencies": {}
+}
